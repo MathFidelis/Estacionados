@@ -28,6 +28,10 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 // Essa variável deve ser global porque pode ser utilizada em mais de um escopo de função.
 int etapa_atual = 0;
 
+// Instanciando as credenciais do ponto de acesso.
+const char * WIFI_FTM_SSID = "Wifi-Turma-4-Grupo-2";
+const char * WIFI_FTM_PASS = "12345678";
+
 /*
  * Limpa o display led.
  */
@@ -195,6 +199,26 @@ void carro_entregue()
 }
 
 /*
+ * Calcula a distância entre esse ESP e o ponto de acesso em metros.
+ */
+float calcular_distancia()
+{
+
+  // Instancia o protocolo RSSI na rede.
+  long rssi = WiFi.RSSI();
+
+  // Calcula a elevação.
+  float elevacao = (-40.0 - rssi) / (10.0 * 2.0);
+
+  // Calcula a distância.
+  float distancia = pow(10, elevacao);
+
+  // Retorna a distância em metros.
+  return distancia;
+
+}
+
+/*
  * Instancia as principais configurações da aplicação, além dos dispositivos de entrada e saída.
  */
 void setup()
@@ -225,6 +249,27 @@ void setup()
 
 	// Limpando o display LED.
 	limpar_display();
+
+  // Imprimindo o status atual do sistema.
+  Serial.println("Conectando ao roteador wi-fi...");
+
+  // Conectando ao roteador wi-fi...
+  WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
+
+  // Imprimindo um ponto no serial enquanto o wi-fi não conecta.
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+    Serial.print(".");
+
+  }
+  
+  // Imprimindo uma linha no serial.
+  Serial.println("");
+
+  // Imprimindo o status atual do sistema.
+  Serial.println("Wi-fi conectado :)");
+
 }
 
 /*
