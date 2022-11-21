@@ -1,5 +1,6 @@
 // Incluindo bibliotecas necessárias à construção do sistema.
 #include <SPI.h>
+#include "WiFi.h"
 #include <Wire.h>
 #include <MFRC522.h>
 #include <LiquidCrystal_I2C.h>
@@ -29,8 +30,11 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 int etapa_atual = 0;
 
 // Instanciando as credenciais do ponto de acesso.
-const char * WIFI_FTM_SSID = "Wifi-Turma-4-Grupo-2";
-const char * WIFI_FTM_PASS = "12345678";
+const char *WIFI_FTM_SSID = "Wifi-Turma-4-Grupo-2";
+const char *WIFI_FTM_PASS = "12345678";
+
+// Instancia o protocolo RSSI na rede.
+long rssi = WiFi.RSSI();
 
 /*
  * Limpa o display led.
@@ -204,18 +208,14 @@ void carro_entregue()
 float calcular_distancia()
 {
 
-  // Instancia o protocolo RSSI na rede.
-  long rssi = WiFi.RSSI();
+	// Calcula a elevação.
+	float elevacao = (-40.0 - rssi) / (10.0 * 2.0);
 
-  // Calcula a elevação.
-  float elevacao = (-40.0 - rssi) / (10.0 * 2.0);
+	// Calcula a distância.
+	float distancia = pow(10, elevacao);
 
-  // Calcula a distância.
-  float distancia = pow(10, elevacao);
-
-  // Retorna a distância em metros.
-  return distancia;
-
+	// Retorna a distância em metros.
+	return distancia;
 }
 
 /*
@@ -250,26 +250,25 @@ void setup()
 	// Limpando o display LED.
 	limpar_display();
 
-  // Imprimindo o status atual do sistema.
-  Serial.println("Conectando ao roteador wi-fi...");
+	// Imprimindo o status atual do sistema.
+	Serial.print("\nConectando ao roteador wi-fi");
 
-  // Conectando ao roteador wi-fi...
-  WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
+	// Conectando ao roteador wi-fi...
+	WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
 
-  // Imprimindo um ponto no serial enquanto o wi-fi não conecta.
-  while (WiFi.status() != WL_CONNECTED) {
+	// Imprimindo um ponto no serial enquanto o wi-fi não conecta.
+	while (WiFi.status() != WL_CONNECTED)
+	{
 
-    delay(500);
-    Serial.print(".");
+		delay(500);
+		Serial.print("...");
+	}
 
-  }
-  
-  // Imprimindo uma linha no serial.
-  Serial.println("");
+	// Imprimindo uma linha no serial.
+	Serial.println("");
 
-  // Imprimindo o status atual do sistema.
-  Serial.println("Wi-fi conectado :)");
-
+	// Imprimindo o status atual do sistema.
+	Serial.println("Wi-fi conectado :)");
 }
 
 /*
@@ -277,6 +276,10 @@ void setup()
  */
 void loop()
 {
+
+	// Imprimindo a distância do roteador em metros.
+	Serial.println("Distância do roteador em metros:");
+	Serial.println(calcular_distancia());
 
 	// Caso não haja um cartão RFID próximo, ou se um cartão RFID permanecer próximo ao sensor, ignorando uma nova leitura...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
