@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { AppDataSource } from "../data-source";
 import { IUser } from "../../api/UseCases/User/Interfaces/IUser";
 import { Entity, Column, PrimaryColumn, CreateDateColumn, OneToOne, UpdateDateColumn, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from "typeorm";
+import { hashSync } from "bcrypt";
 
 @Entity("user")
 export class User {
@@ -56,7 +57,7 @@ export class User {
 		user.email = data.email;
 
 		// Setting up the instancied user password as the received password.
-		user.password = data.password;
+		user.password = hashSync(data.password, 10);
 
 		// Setting up the instancied user role as the received role.
 		user.role = data.role;
