@@ -19,10 +19,10 @@ export class Order_of_service {
 	@Column({type: "varchar", nullable: false})
 	status: "pending" | "accepted" | "finished";
 
-	@Column({type: "date", nullable: false})
+	@Column({type: "timestamp", nullable: false})
 	accepted_at?: Date;
 
-	@Column({type: "date", nullable: false})
+	@Column({type: "timestamp", nullable: false})
 	finished_at?: Date;
 
 	@BeforeInsert()
