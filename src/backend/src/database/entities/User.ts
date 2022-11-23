@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { IUser } from "../../api/UseCases/User/Interfaces/IUser";
 import { Entity, Column, PrimaryColumn, CreateDateColumn, OneToOne, UpdateDateColumn, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from "typeorm";
 import { hashSync } from "bcrypt";
+import { Valet } from "./Valet";
 
 @Entity("user")
 export class User {
@@ -24,6 +25,9 @@ export class User {
 
 	@UpdateDateColumn({type: "timestamp", nullable: false})
 	updated_at?: Date;
+
+	@OneToOne(() => Valet, valet => valet.user)
+	valet?: Valet;
 
 	@BeforeInsert()
 	setId() {
