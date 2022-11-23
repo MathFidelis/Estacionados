@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
-import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { User } from "./User";
 
 @Entity("order_of_service")
 export class Order_of_service {
@@ -19,11 +20,20 @@ export class Order_of_service {
 	@Column({type: "varchar", nullable: false})
 	status: "pending" | "accepted" | "finished";
 
+	@CreateDateColumn({type: "timestamp", nullable: false})
+	created_at?: Date;
+
 	@Column({type: "timestamp", nullable: false})
 	accepted_at?: Date;
 
 	@Column({type: "timestamp", nullable: false})
 	finished_at?: Date;
+
+	@UpdateDateColumn({type: "timestamp", nullable: false})
+	updated_at?: Date;
+
+	@ManyToOne(() => User, user => user.order_of_service)
+	user: User;
 
 	@BeforeInsert()
 	setId() {

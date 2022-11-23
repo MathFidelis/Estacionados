@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { IUser } from "../../api/UseCases/User/Interfaces/IUser";
 import { Entity, Column, PrimaryColumn, CreateDateColumn, OneToOne, UpdateDateColumn, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from "typeorm";
 import { hashSync } from "bcrypt";
+import { Order_of_service } from "./Order_of_service";
 
 @Entity("user")
 export class User {
@@ -45,6 +46,9 @@ export class User {
 
 	@UpdateDateColumn({type: "timestamp", nullable: false})
 	updated_at?: Date;
+
+	@OneToMany(() => Order_of_service, order_of_service => order_of_service.user)
+	order_of_service ?: Order_of_service;
 
 	@BeforeInsert()
 	setId() {
