@@ -62,7 +62,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 	
 	}
 
-	verify(token, process.env.JWT_SECRET, (err, decoded : { id : string, email : string}) => {
+	verify(token, process.env.JWT_SECRET, (err, decoded : { id : string, email : string, role : "manager" | "attendant" | "valet"}) => {
 
 		if(err){
 
@@ -84,6 +84,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 		req.user = {
 			id: decoded.id,
 			email: decoded.email,
+			role: decoded.role,
 		};
 
 		next();

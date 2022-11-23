@@ -44,6 +44,10 @@ export const errors = {
 		code: 1408,
 		title: "Não autorizado.",
 		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
-	}
-
+	},
+	insufficient_permission_level: {
+		code: 1409,
+		title: "Nível de permissão insuficiente.",
+		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
+	},
 };

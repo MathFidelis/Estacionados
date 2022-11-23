@@ -163,7 +163,7 @@ export class User {
 	async generateToken() {
 
 		// Generating a new token for the user.
-		const token = sign({id: this.id, email: this.email}, process.env.JWT_SECRET, {expiresIn: "1d"});
+		const token = sign({id: this.id, email: this.email, role: this.role}, process.env.JWT_SECRET, {expiresIn: "1d"});
 
 		// Returning the generated token.
 		return token;
