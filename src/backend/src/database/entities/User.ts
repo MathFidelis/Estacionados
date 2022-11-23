@@ -2,8 +2,9 @@ import { randomUUID } from "crypto";
 import { AppDataSource } from "../data-source";
 import { IUser } from "../../api/UseCases/User/Interfaces/IUser";
 import { Entity, Column, PrimaryColumn, CreateDateColumn, OneToOne, UpdateDateColumn, BeforeInsert, OneToMany, JoinColumn, ManyToOne } from "typeorm";
-import { hashSync } from "bcrypt";
+import { hashSync, compareSync } from "bcrypt";
 import { Order_of_service } from "./Order_of_service";
+import { sign } from "jsonwebtoken";
 
 @Entity("user")
 export class User {
@@ -113,6 +114,43 @@ export class User {
 
 		// Returning the created user
 		return user;
+
+	}
+
+	async getUserByEmailAddress(data : {email : string}) {
+		
+		// Instacing a new user object.
+		const user = new User;
+
+		// Setting up the instancied user email address as the received email address.
+		user.email = data.email;
+
+		// Getting the user by email address.
+		const user_found = await AppDataSource.getRepository(User).findOneBy({email: user.email});
+
+		// Returning the user found.
+		return user_found;
+
+	}
+
+	async checkPassword(password : string) {
+
+		// Checking if the received password is the same as the user password.
+		const isPasswordCorrect = compareSync(password, this.password);
+
+		// Returning if the password is correct or not.
+		return isPasswordCorrect;
+
+
+	}
+
+	async generateToken() {
+
+		// Generating a new token for the user.
+		const token = sign({id: this.id, email: this.email}, process.env.JWT_SECRET, {expiresIn: "1d"});
+
+		// Returning the generated token.
+		return token;
 
 	}
 
