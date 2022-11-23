@@ -19,6 +19,31 @@ export const errors = {
 		code: 1403,
 		title: "Senha inválida.",
 		description: "A senha informada não corresponde à senha da conta vinculada ao endereço de e-mail informado."
+	},
+	no_token_provided: {
+		code: 1404,
+		title: "Nenhum token fornecido.",
+		description: "Nenhum token de autenticação foi fornecido."
+	},
+	invalid_token_format: {
+		code: 1405,
+		title: "Formato de token inválido.",
+		description: "O formato do token fornecido é inválido."
+	},
+	invalid_token_schema: {
+		code: 1406,
+		title: "Esquema de token inválido.",
+		description: "O esquema do token fornecido é inválido."
+	},
+	invalid_or_expired_token: {
+		code: 1407,
+		title: "Token inválido ou expirado.",
+		description: "O token fornecido é inválido ou expirou."
+	},
+	unauthorized: {
+		code: 1408,
+		title: "Não autorizado.",
+		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
 	}
 
 };

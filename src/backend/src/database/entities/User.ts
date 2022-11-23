@@ -133,6 +133,22 @@ export class User {
 
 	}
 
+	async getUserById(data : { id : string }) {
+
+		// Instacing a new user object.
+		const user = new User;
+
+		// Setting up the instancied user email address as the received email address.
+		user.id = data.id;
+
+		// Getting the user by email address.
+		const user_found = await AppDataSource.getRepository(User).findOneBy({id: user.id});
+
+		// Returning the user found.
+		return user_found;
+
+	}
+
 	async checkPassword(password : string) {
 
 		// Checking if the received password is the same as the user password.
