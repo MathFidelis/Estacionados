@@ -3,7 +3,6 @@
 #include "WiFi.h"
 #include <Wire.h>
 #include <MFRC522.h>
-#include <LiquidCrystal_I2C.h>
 
 // Definindo as portas de saída de dispositivos comuns.
 #define OUTPUT_LED_R 36
@@ -18,13 +17,6 @@
 // Definindo o rfid base.
 MFRC522 rfid = MFRC522(RFID_SS_SDA, RFID_RST);
 
-// Definindo as portas do display LED.
-#define I2C_SDA 2
-#define I2C_SCL 1
-
-// Configurando o display LED.
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-
 // Definindo o contador de etapas do dispositivo para controle interno.
 // Essa variável deve ser global porque pode ser utilizada em mais de um escopo de função.
 int etapa_atual = 0;
@@ -35,15 +27,6 @@ const char *WIFI_FTM_PASS = "12345678";
 
 // Instancia o protocolo RSSI na rede.
 long rssi = WiFi.RSSI();
-
-/*
- * Limpa o display led.
- */
-void limpar_display()
-{
-
-	lcd.clear();
-}
 
 /*
  * Toca um som de operação realizada com sucesso no buzzer da aplicação,
@@ -103,39 +86,8 @@ void operacao_iniciada()
 	// Tocando som de operação realizada com sucesso.
 	tocar_som_de_operacao_realizada();
 
-	// Escrevendo no display led.
-	lcd.begin(16, 2);
-	lcd.setBacklight(HIGH);
-
-	// Primeira mensagem.
-	lcd.setCursor(0, 0);
-	lcd.print("Motorista:");
-	lcd.setCursor(0, 1);
-	lcd.print("Joao Gonzalez");
-
 	// Delay...
 	delay(3000);
-
-	// Limpando LCD...
-	lcd.clear();
-
-	// Segunda mensagem.
-	lcd.setCursor(0, 0);
-	lcd.print("Veículo:");
-	lcd.setCursor(0, 1);
-	lcd.print("AUX-9I10");
-
-	// Delay...
-	delay(3000);
-
-	// Limpando LCD...
-	lcd.clear();
-
-	// Terceira mensagem.
-	lcd.setCursor(0, 0);
-	lcd.print("Arguardando estacionar...");
-	lcd.setCursor(0, 1);
-	lcd.print("Encoste o seu cartão ao fazer.");
 
 	etapa_atual++;
 }
@@ -146,9 +98,6 @@ void operacao_iniciada()
 void carro_estacionado()
 {
 
-	// Limpando LCD...
-	lcd.clear();
-
 	// Acendendo o LED na cor amarela.
 	digitalWrite(OUTPUT_LED_G, HIGH);
 	digitalWrite(OUTPUT_LED_B, HIGH);
@@ -156,12 +105,6 @@ void carro_estacionado()
 
 	// Tocando som de operação realizada com sucesso.
 	tocar_som_de_operacao_realizada();
-
-	// Terceira mensagem.
-	lcd.setCursor(0, 0);
-	lcd.print("Status:");
-	lcd.setCursor(0, 1);
-	lcd.print("Carro estacionado");
 
 	etapa_atual++;
 }
@@ -171,9 +114,6 @@ void carro_estacionado()
  */
 void carro_entregue()
 {
-
-	// Limpando LCD...
-	lcd.clear();
 
 	// Tocando som de operação realizada com sucesso.
 	tocar_som_de_operacao_realizada();
@@ -190,10 +130,6 @@ void carro_entregue()
 	digitalWrite(OUTPUT_LED_R, HIGH);
 	digitalWrite(OUTPUT_LED_G, HIGH);
 	digitalWrite(OUTPUT_LED_B, LOW);
-
-	// Terceira mensagem.
-	lcd.setCursor(0, 0);
-	lcd.print("Carro entregue.");
 
 	// Delay...
 	delay(2500);
@@ -243,12 +179,6 @@ void setup()
 	digitalWrite(OUTPUT_LED_R, LOW);
 	digitalWrite(OUTPUT_LED_G, HIGH);
 	digitalWrite(OUTPUT_LED_B, LOW);
-
-	// Inicializando o display LED.
-	Wire.begin(I2C_SDA, I2C_SCL);
-
-	// Limpando o display LED.
-	limpar_display();
 
 	// Imprimindo o status atual do sistema.
 	Serial.print("\nConectando ao roteador wi-fi");
