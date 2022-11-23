@@ -36,13 +36,16 @@ export const UserService =  {
 				// If user isn't already registered, creating the user in database.
 				const created_user = await user.store(data);
 
+				// Cleaning up the encripted password from the database response.
+				delete created_user.password;
+
 				// Returning the created user with its account confirmation status.
 				return {
 					status: 201, 
 					success: {
 						code: success.user_created.code,
 						title: success.user_created.title,
-						data: await AppDataSource.getRepository(User).findOne({where: {id: created_user.id}})
+						data: created_user,
 					}
 				};
 
