@@ -10,5 +10,5 @@ export interface IOrder_of_service {
 	accepted_at?: Date,
 	finished_at?: Date,
 	updated_at?: Date,
-	user: IUser
+	user?: IUser
 }
