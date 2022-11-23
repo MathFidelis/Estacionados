@@ -25,17 +25,17 @@ export class Order_of_service {
 	@CreateDateColumn({type: "timestamp", nullable: false})
 	created_at?: Date;
 
-	@Column({type: "timestamp", nullable: false})
+	@Column({type: "timestamp", nullable: true})
 	accepted_at?: Date;
 
-	@Column({type: "timestamp", nullable: false})
+	@Column({type: "timestamp", nullable: true})
 	finished_at?: Date;
 
 	@UpdateDateColumn({type: "timestamp", nullable: false})
 	updated_at?: Date;
 
 	@ManyToOne(() => User, user => user.order_of_service)
-	user: User;
+	user?: User;
 
 	@BeforeInsert()
 	setId() {

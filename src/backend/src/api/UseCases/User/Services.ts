@@ -68,6 +68,31 @@ export const UserService =  {
 	
 		}
 	
+	},
+
+	async auth(data : {email : string, password : string}) {
+		
+		try {
+
+			//
+
+		} catch(error) {
+
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+		}
+	
 	}
 
 };
