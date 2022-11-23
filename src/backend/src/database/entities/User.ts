@@ -37,8 +37,8 @@ export class User {
 	@Column({type: "varchar", nullable: false})
 	type_of_driver_license: string;
 
-	@Column({type: "varchar", nullable: false})
-	class: string;
+	@Column({type: "boolean", nullable: false})
+	is_temporary_employee: boolean;
 
 	@CreateDateColumn({type: "timestamp", nullable: false})
 	created_at?: Date;

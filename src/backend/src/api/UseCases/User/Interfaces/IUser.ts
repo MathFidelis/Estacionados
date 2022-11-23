@@ -9,7 +9,7 @@ export interface IUser {
 	identity_number: string,
 	date_of_birth: Date,
 	type_of_driver_license: string,
-	class: string,
+	is_temporary_employee: boolean,
 	created_at?: Date,
 	updated_at?: Date
 }
