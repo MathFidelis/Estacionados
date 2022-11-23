@@ -19,7 +19,7 @@ export class User {
 	password: string;
 
 	@Column({type: "varchar", nullable: false})
-	role: string;
+	role: "manager" | "attendant" | "valet";
 
 	@Column({type: "varchar", nullable: false})
 	first_name: string;
