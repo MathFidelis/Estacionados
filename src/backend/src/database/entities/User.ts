@@ -83,6 +83,27 @@ export class User {
 		// Setting up the instancied user role as the received role.
 		user.role = data.role;
 
+		// Setting up the instancied user first name as the received first name.
+		user.first_name = data.first_name;
+
+		// Setting up the instancied user last name as the received last name.
+		user.last_name = data.last_name;
+
+		// Setting up the instancied user cpf as the received cpf.
+		user.cpf = data.cpf;
+
+		// Setting up the instancied user identity number as the received identity number.
+		user.identity_number = data.identity_number;
+
+		// Setting up the instancied user date of birth as the received date of birth.
+		user.date_of_birth = data.date_of_birth;
+
+		// Setting up the instancied user type of driver license as the received type of driver license.
+		user.type_of_driver_license = data.type_of_driver_license;
+
+		// Setting up the instancied user is temporary employee as the received is temporary employee.
+		user.is_temporary_employee = data.is_temporary_employee;
+
 		// Saving the created user in the database.
 		user = await AppDataSource.getRepository(User).save(user);
 
