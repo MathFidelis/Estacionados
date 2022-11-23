@@ -2,7 +2,7 @@ export interface IUser {
 	id: string,
 	email: string,
 	password: string,
-	role: string,
+	role: "manager" | "attendant" | "valet",
 	first_name: string,
 	last_name: string,
 	cpf: string,
