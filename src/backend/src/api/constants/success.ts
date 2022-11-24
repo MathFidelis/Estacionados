@@ -27,4 +27,8 @@ export const success = {
 		code: 1207,
 		title: "Ordens de serviço obtidas com sucesso.",
 	},
+	order_of_service_got: {
+		code: 1208,
+		title: "Ordem de serviço obtida com sucesso.",
+	},
 };

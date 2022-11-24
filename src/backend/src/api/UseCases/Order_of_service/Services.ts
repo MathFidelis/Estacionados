@@ -279,4 +279,58 @@ export const OrderOfServiceService = {
 
 	},
 
+	async listOneById(order_of_service_id : string) {
+
+		try {
+
+			// Getting the order of service from database.
+			const target_order_of_service = await order_of_service.getOrderOfServiceById({id: order_of_service_id});
+
+			// Checking if the order of service exists.
+			if(!target_order_of_service) {
+				
+				return {
+					status: 404,
+					error: {
+						code: errors.order_of_service_not_found.code,
+						title: errors.order_of_service_not_found.title,
+						description: errors.order_of_service_not_found.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+			}
+
+			// Returning the order of service.
+			return {
+				status: 201, 
+				success: {
+					code: success.order_of_service_got.code,
+					title: success.order_of_service_got.title,
+					data: target_order_of_service,
+				}
+			};
+
+		} catch (error) {
+		
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+		}
+	
+	}
+
 };
