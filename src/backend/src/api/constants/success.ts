@@ -19,4 +19,12 @@ export const success = {
 		code: 1205,
 		title: "Ordem de serviço finalizada com sucesso.",
 	},
+	pending_orders_of_service_got: {
+		code: 1206,
+		title: "Ordens de serviço pendentes obtidas com sucesso.",
+	},
+	orders_of_service_got: {
+		code: 1207,
+		title: "Ordens de serviço obtidas com sucesso.",
+	},
 };

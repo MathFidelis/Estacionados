@@ -85,5 +85,22 @@ export class Order_of_service {
 
 	}
 
+	// async getAll() {
+
+	// 	const orders_of_services = await AppDataSource.getRepository(Order_of_service).find();
+
+	// 	return orders_of_services;
+
+	// }
+
+	// async getAllPending() {
+
+
+	// 	const orders_of_services = await AppDataSource.getRepository(Order_of_service).find({where: {status: "pending"}});
+
+	// 	return orders_of_services;
+
+	// }
+
 
 }

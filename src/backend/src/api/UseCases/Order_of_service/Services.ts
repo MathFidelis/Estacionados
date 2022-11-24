@@ -238,6 +238,84 @@ export const OrderOfServiceService = {
 
 		}
 	
-	}
+	},
+
+	// async getAll() {
+
+	// 	try {
+
+	// 		// Getting all orders of service from database.
+	// 		const orders_of_services = await order_of_service.getAll();
+
+	// 		// Returning all orders of services.
+	// 		return {
+	// 			status: 201, 
+	// 			success: {
+	// 				code: success.orders_of_service_got.code,
+	// 				title: success.orders_of_service_got.title,
+	// 				data: orders_of_services,
+	// 			}
+	// 		};
+	
+
+
+	// 	} catch (error) {
+
+	// 		return {
+	// 			status: 500,
+	// 			error: {
+	// 				code: errors.internal_server_error.code,
+	// 				title: errors.internal_server_error.title,
+	// 				description: errors.internal_server_error.description,
+	// 				source: {
+	// 					pointer: __filename,
+	// 					line: getCurrentLine().line
+	// 				}
+	// 			}
+	// 		};
+
+
+	// 	}
+
+	// },
+
+	// async getAllPending() {
+
+	// 	try {
+
+	// 		// Getting the pending orders of service from database.
+	// 		const orders_of_services = await order_of_service.getAllPending();
+
+	// 		// Returning the pending orders of services.
+	// 		return {
+	// 			status: 201, 
+	// 			success: {
+	// 				code: success.pending_orders_got.code,
+	// 				title: success.pending_orders_got.title,
+	// 				data: orders_of_services,
+	// 			}
+	// 		};
+	
+
+
+	// 	} catch (error) {
+
+	// 		return {
+	// 			status: 500,
+	// 			error: {
+	// 				code: errors.internal_server_error.code,
+	// 				title: errors.internal_server_error.title,
+	// 				description: errors.internal_server_error.description,
+	// 				source: {
+	// 					pointer: __filename,
+	// 					line: getCurrentLine().line
+	// 				}
+	// 			}
+	// 		};
+
+
+	// 	}
+
+	// }
 
 };
