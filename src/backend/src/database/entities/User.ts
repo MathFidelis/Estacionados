@@ -170,4 +170,20 @@ export class User {
 
 	}
 
+	async list(target_roles : string[]) {
+
+		const query = [];
+
+		target_roles.forEach(role => {
+
+			query.push({"role": role});
+
+		});
+
+		const users = await AppDataSource.getRepository(User).find({where: query});
+
+		return users;
+
+	}
+
 }

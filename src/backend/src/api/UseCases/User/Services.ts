@@ -157,6 +157,45 @@ export const UserService =  {
 
 		}
 	
-	}
+	},
+
+	async list(target_roles : string[]) {
+
+		try {
+
+			// Getting all orders of service from database.
+			const users = await user.list(target_roles);
+
+			// Returning all orders of services.
+			return {
+				status: 201, 
+				success: {
+					code: success.users_got.code,
+					title: success.users_got.title,
+					data: users,
+				}
+			};
+	
+
+
+		} catch (error) {
+
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+
+		}
+
+	},
 
 };

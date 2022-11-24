@@ -31,4 +31,8 @@ export const success = {
 		code: 1208,
 		title: "Ordem de serviço obtida com sucesso.",
 	},
+	users_got: {
+		code: 1209,
+		title: "Usuários obtidos com sucesso.",
+	},
 };
