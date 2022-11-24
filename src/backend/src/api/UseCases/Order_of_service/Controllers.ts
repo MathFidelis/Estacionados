@@ -65,7 +65,7 @@ export const OrderOfServiceController = {
 
 		try {
 
-			const response = await OrderOfServiceService.finish(req.user.id, req.params.id);
+			const response = await OrderOfServiceService.finish(req.params.id);
 
 			return res.status(response.status).json(response);
 		

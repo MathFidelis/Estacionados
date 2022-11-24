@@ -138,7 +138,7 @@ export const OrderOfServiceService = {
 	
 	},
 
-	async finish(user_id : string, order_of_service_id : string) {
+	async finish(order_of_service_id : string) {
 
 		try {
 
@@ -200,12 +200,6 @@ export const OrderOfServiceService = {
 
 
 			}
-
-			// Getting the user from database and associating it to the order of service.
-			target_order_of_service.user = await user.getUserById({id: user_id});
-
-			// Deleting the user password from response.
-			delete target_order_of_service.user.password;
 
 			// Setting the accepted date.
 			target_order_of_service.finished_at = new Date();
