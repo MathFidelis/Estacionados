@@ -60,4 +60,14 @@ export const errors = {
 		title: "Ordem de serviço já aceita.",
 		description: "A ordem de serviço solicitada já foi aceita."
 	},
+	order_of_service_still_not_accepted: {
+		code: 1412,
+		title: "Ordem de serviço ainda não aceita.",
+		description: "A ordem de serviço solicitada ainda não foi aceita."
+	},
+	order_of_service_already_finished: {
+		code: 1413,
+		title: "Ordem de serviço já finalizada.",
+		description: "A ordem de serviço solicitada já foi finalizada."
+	},
 };

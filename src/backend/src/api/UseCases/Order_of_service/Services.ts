@@ -136,6 +136,114 @@ export const OrderOfServiceService = {
 
 		}
 	
+	},
+
+	async finish(user_id : string, order_of_service_id : string) {
+
+		try {
+
+			// Getting the order of service from database.
+			let target_order_of_service = await order_of_service.getOrderOfServiceById({id: order_of_service_id});
+
+			// Checking if the order of service exists.
+			if(!target_order_of_service) {
+				
+				return {
+					status: 404,
+					error: {
+						code: errors.order_of_service_not_found.code,
+						title: errors.order_of_service_not_found.title,
+						description: errors.order_of_service_not_found.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+			}
+
+			// Checking if the order of service still not accepted.
+			if (target_order_of_service.status == "pending") {
+			
+				return {
+					status: 400,
+					error: {
+						code: errors.order_of_service_still_not_accepted.code,
+						title: errors.order_of_service_still_not_accepted.title,
+						description: errors.order_of_service_still_not_accepted.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+
+			}
+
+			// Checking if the order of service is already finished.
+			if (target_order_of_service.status == "finished") {
+			
+				return {
+					status: 400,
+					error: {
+						code: errors.order_of_service_already_finished.code,
+						title: errors.order_of_service_already_finished.title,
+						description: errors.order_of_service_already_finished.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+
+			}
+
+			// Getting the user from database and associating it to the order of service.
+			target_order_of_service.user = await user.getUserById({id: user_id});
+
+			// Deleting the user password from response.
+			delete target_order_of_service.user.password;
+
+			// Setting the accepted date.
+			target_order_of_service.finished_at = new Date();
+
+			// Updating the order of service status.
+			target_order_of_service.status = "finished";
+
+			// Saving the modified order of service in database.
+			target_order_of_service = await AppDataSource.getRepository(Order_of_service).save(target_order_of_service);
+
+			// Returning the updated order of service.
+			return {
+				status: 201, 
+				success: {
+					code: success.order_of_service_finished.code,
+					title: success.order_of_service_finished.title,
+					data: target_order_of_service,
+				}
+			};
+	
+
+		} catch(error) {
+
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+		}
+	
 	}
 
 };
