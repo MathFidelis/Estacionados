@@ -85,22 +85,22 @@ export class Order_of_service {
 
 	}
 
-	// async getAll() {
+	async list(statuses_list : string[]) {
 
-	// 	const orders_of_services = await AppDataSource.getRepository(Order_of_service).find();
+		const query = [];
 
-	// 	return orders_of_services;
+		statuses_list.forEach(status => {
 
-	// }
+			query.push({"status": status});
 
-	// async getAllPending() {
+		});
 
+		console.log(query);
 
-	// 	const orders_of_services = await AppDataSource.getRepository(Order_of_service).find({where: {status: "pending"}});
+		const orders_of_services = await AppDataSource.getRepository(Order_of_service).find({where: query});
 
-	// 	return orders_of_services;
+		return orders_of_services;
 
-	// }
-
+	}
 
 }

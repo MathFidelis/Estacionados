@@ -89,61 +89,48 @@ export const OrderOfServiceController = {
 
 	},
 
-	// async getAll(req : Request, res : Response, next : NextFunction) {
-	
-	// 	try {
+	async list(req : Request, res : Response, next : NextFunction) {
+
+		// Getting the desired statuses from query params.
+		let target_statuses = req.query.status;
+
+		// If no target statuses was provided, then we will list all orders of service.
+		if(!target_statuses) {
+
+			target_statuses = "pending,accepted,finished";
 			
-	// 		const response = await OrderOfServiceService.getAll();
+		}
 
-	// 		return res.status(response.status).json(response);
+		// Converting the target statuses to an string object.
+		const str_target_statuses = new String(target_statuses);
+
+		// Splitting the target statuses by comma.
+		const statuses_list = str_target_statuses.split(",");
+
+		try {
 		
-	// 	} catch (error) {
+			const response = await OrderOfServiceService.list(statuses_list);
 
-	// 		return {
-	// 			status: 500,
-	// 			error: {
-	// 				code: errors.internal_server_error.code,
-	// 				title: errors.internal_server_error.title,
-	// 				description: errors.internal_server_error.description,
-	// 				source: {
-	// 					pointer: __filename,
-	// 					line: getCurrentLine().line
-	// 				}
-	// 			}
-	// 		};
-
-
-	// 	}
-	
-	// },
-
-
-	// async getAllPending(req : Request, res : Response, next : NextFunction) {
-	
-	// 	try {
-			
-	// 		const response = await OrderOfServiceService.getAllPending();
-
-	// 		return res.status(response.status).json(response);
+			return res.status(response.status).json(response);
 		
-	// 	} catch (error) {
+		} catch (error) {
 
-	// 		return {
-	// 			status: 500,
-	// 			error: {
-	// 				code: errors.internal_server_error.code,
-	// 				title: errors.internal_server_error.title,
-	// 				description: errors.internal_server_error.description,
-	// 				source: {
-	// 					pointer: __filename,
-	// 					line: getCurrentLine().line
-	// 				}
-	// 			}
-	// 		};
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
 
 
-	// 	}
+		}
 	
-	// },
+	},
 
 };
