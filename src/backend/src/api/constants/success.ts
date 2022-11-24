@@ -35,4 +35,8 @@ export const success = {
 		code: 1209,
 		title: "Usuários obtidos com sucesso.",
 	},
+	user_got: {
+		code: 1210,
+		title: "Usuário obtido com sucesso.",
+	},
 };

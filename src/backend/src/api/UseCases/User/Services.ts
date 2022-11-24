@@ -198,4 +198,58 @@ export const UserService =  {
 
 	},
 
+	async listOneById(user_id : string) {
+
+		try {
+
+			// Getting the order of service from database.
+			const target_user = await user.getUserById({id: user_id});
+
+			// Checking if the order of service exists.
+			if(!target_user) {
+				
+				return {
+					status: 404,
+					error: {
+						code: errors.user_not_found.code,
+						title: errors.user_not_found.title,
+						description: errors.user_not_found.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+			}
+
+			// Returning the order of service.
+			return {
+				status: 201, 
+				success: {
+					code: success.user_got.code,
+					title: success.user_got.title,
+					data: target_user,
+				}
+			};
+
+		} catch (error) {
+		
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+		}
+	
+	}
+
 };
