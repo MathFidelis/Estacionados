@@ -50,4 +50,14 @@ export const errors = {
 		title: "Nível de permissão insuficiente.",
 		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
 	},
+	order_of_service_not_found: {
+		code: 1410,
+		title: "Ordem de serviço não encontrada.",
+		description: "A ordem de serviço solicitada não foi encontrada."
+	},
+	order_of_service_already_accepted: {
+		code: 1411,
+		title: "Ordem de serviço já aceita.",
+		description: "A ordem de serviço solicitada já foi aceita."
+	},
 };

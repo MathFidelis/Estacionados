@@ -69,5 +69,21 @@ export class Order_of_service {
 
 	}
 
+	async getOrderOfServiceById(data : { id : string }) {
+
+		// Instacing a new user object.
+		const order_of_service = new Order_of_service;
+
+		// Setting up the instancied user email address as the received email address.
+		order_of_service.id = data.id;
+
+		// Getting the user by email address.
+		const order_of_service_found = await AppDataSource.getRepository(Order_of_service).findOneBy({id: order_of_service.id});
+
+		// Returning the user found.
+		return order_of_service_found;
+
+	}
+
 
 }
