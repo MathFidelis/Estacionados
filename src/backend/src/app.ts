@@ -5,6 +5,7 @@ import express  from "express";
 // Importing all required routes.
 import userRoutes from "./routes/userRoutes";
 import orderOfServiceRoutes from "./routes/orderOfServiceRoutes";
+import rootRoutes from "./routes/rootRoutes";
 
 // Instacing the app.
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Setting up the application routes.
+app.use("/api/v1", rootRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/order-of-service", orderOfServiceRoutes);
 

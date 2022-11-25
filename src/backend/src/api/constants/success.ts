@@ -1,4 +1,8 @@
 export const success = {
+	server_info : {
+		code: 1200,
+		title: "Informações do servidor obtidas com sucesso."
+	},
 	user_created: {
 		code: 1201,
 		title: "Usuário criado com sucesso.",
