@@ -1,0 +1,12 @@
+input::placeholder {
+
+    color: #CECECE;
+    font-weight: 500;
+  
+  }
+  
+  button, a {
+  
+    cursor: pointer;
+  
+}
