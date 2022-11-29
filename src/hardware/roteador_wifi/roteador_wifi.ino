@@ -16,6 +16,8 @@ void setup() {
   // Configurando o ponto de acesso.
   WiFi.softAP(WIFI_FTM_SSID, WIFI_FTM_PASS, 1, 0, 4, true);
 
+  Serial.print("[+] AP criado com sucesso com o endereço IP ");
+  Serial.println(WiFi.softAPIP());
 
 }
 

@@ -25,8 +25,87 @@ int etapa_atual = 0;
 const char *WIFI_FTM_SSID = "Wifi-Turma-4-Grupo-2";
 const char *WIFI_FTM_PASS = "12345678";
 
-// Instancia o protocolo RSSI na rede.
-long rssi = WiFi.RSSI();
+// -------------------------- Atenção --------------------------
+//
+// Início das configurações para medição de distância - <<<FTM>>>.
+//
+// -------------------------------------------------------------
+
+// Configurando os períodos.
+const uint8_t FTM_FRAME_COUNT = 16;
+const uint16_t FTM_BURST_PERIOD = 2;
+
+// Instanciando um semáforo para sinalizar quando um relatório FTM for recebido.
+xSemaphoreHandle sinalizadorFTM;
+
+// Instanciando variável para armazenar o status do relatório FTM a ser recebido.
+bool status_do_relatorio_FTM = true;
+
+// Instanciando variável para armazenar a distância calculada.
+float distancia_do_roteador_em_metros = 0.0;
+
+/*
+ * Calcula a distância estimada quando um relatório ftm for recebido.
+ */
+void ao_receber_um_relatorio_FTM(arduino_event_t *event) {
+
+  // Instanciando os status possíveis de resposta.
+  const char * status_str[5] = {"SUCCESS", "UNSUPPORTED", "CONF_REJECTED", "NO_RESPONSE", "FAIL"};
+
+  // Instanciando um ponteiro para o relatório.
+  wifi_event_ftm_report_t * report = &event -> event_info.wifi_ftm_report;
+
+  // Definindo o status global do relatório.
+  status_do_relatorio_FTM = report -> status == FTM_STATUS_SUCCESS;
+
+  // Controlando o fluxo através do status atual do relatório.
+  if (status_do_relatorio_FTM) {
+
+    // Armazenando a distância calculada.
+    distancia_do_roteador_em_metros = (report -> dist_est / 100.0) - 40.0;
+
+    // Limpando a memória após o uso das variáveis.
+    free(report->ftm_report_data);
+
+  } else {
+
+    // Imprimindo o erro.
+    Serial.println("Relatório FTM negado: ");
+    Serial.println(status_str[report->status]);
+
+  }
+
+  // Informando que um semáforo foi recebido.
+  xSemaphoreGive(sinalizadorFTM);
+
+}
+
+/*
+ * Iniciando uma sessão FTM e solicitando um relatório FTM.
+ */
+bool solicitar_um_relatorio_FTM(){
+
+  // Controlando possíveis erros.
+  if(!WiFi.initiateFTM(FTM_FRAME_COUNT, FTM_BURST_PERIOD)){
+
+    // Informando a falha ao iniciar sessão.
+    Serial.println("ERRO FTM: Falha ao iniciar sessão.");
+
+    // Retornando uma resposta negativa.
+    return false;
+
+  }
+
+  // Aguardando o sinal que o relatório foi recebido com sucesso e retornando verdadeiro.
+  return xSemaphoreTake(sinalizadorFTM, portMAX_DELAY) == pdPASS && status_do_relatorio_FTM;
+
+}
+
+// -------------------------- Atenção --------------------------
+//
+// Fim das configurações para medição de distância - <<<FTM>>>.
+//
+// -------------------------------------------------------------
 
 /*
  * Toca um som de operação realizada com sucesso no buzzer da aplicação,
@@ -38,6 +117,7 @@ void tocar_som_de_operacao_realizada()
 	tone(OUTPUT_BUZZER, 3000);
 	delay(1000);
 	noTone(OUTPUT_BUZZER);
+
 }
 
 /*
@@ -70,6 +150,7 @@ void capturar_RFID()
 
 	// Parando a criptografia no PCD.
 	rfid.PCD_StopCrypto1();
+
 }
 
 /*
@@ -90,6 +171,7 @@ void operacao_iniciada()
 	delay(3000);
 
 	etapa_atual++;
+
 }
 
 /*
@@ -107,6 +189,7 @@ void carro_estacionado()
 	tocar_som_de_operacao_realizada();
 
 	etapa_atual++;
+
 }
 
 /*
@@ -136,22 +219,7 @@ void carro_entregue()
 
 	// Reiniciando o dispositivo.
 	ESP.restart();
-}
 
-/*
- * Calcula a distância entre esse ESP e o ponto de acesso em metros.
- */
-float calcular_distancia()
-{
-
-	// Calcula a elevação.
-	float elevacao = (-40.0 - rssi) / (10.0 * 2.0);
-
-	// Calcula a distância.
-	float distancia = pow(10, elevacao);
-
-	// Retorna a distância em metros.
-	return distancia;
 }
 
 /*
@@ -190,15 +258,48 @@ void setup()
 	while (WiFi.status() != WL_CONNECTED)
 	{
 
-		delay(500);
+    // Conectando ao roteador wi-fi...
+	  WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
 		Serial.print("...");
+		delay(500);
+    
 	}
 
 	// Imprimindo uma linha no serial.
 	Serial.println("");
 
 	// Imprimindo o status atual do sistema.
-	Serial.println("Wi-fi conectado :)");
+	Serial.println("Wi-fi conectado!");
+
+  // -------------------------- Atenção --------------------------
+  //
+  // Início das configurações para medição de distância - <<<FTM>>>.
+  //
+  // -------------------------------------------------------------
+
+  // Criando um semáforo binário.
+  sinalizadorFTM = xSemaphoreCreateBinary();
+
+  // Escutando eventos de relatórios FTM.
+  WiFi.onEvent(ao_receber_um_relatorio_FTM, ARDUINO_EVENT_WIFI_FTM_REPORT);
+
+  // Informando o status atual do sistema.
+  Serial.println("Inicializando sessão FTM...");
+
+  // Requisitando relatórios FTM até que um falhe.
+  while(solicitar_um_relatorio_FTM()) {
+
+    Serial.printf("Distância atual: %.2f m\n", (float) distancia_do_roteador_em_metros);
+    delay(1000);
+
+  };
+
+  // -------------------------- Atenção --------------------------
+  //
+  // Fim das configurações para medição de distância - <<<FTM>>>.
+  //
+  // -------------------------------------------------------------
+
 }
 
 /*
@@ -206,10 +307,6 @@ void setup()
  */
 void loop()
 {
-
-	// Imprimindo a distância do roteador em metros.
-	Serial.println("Distância do roteador em metros:");
-	Serial.println(calcular_distancia());
 
 	// Caso não haja um cartão RFID próximo, ou se um cartão RFID permanecer próximo ao sensor, ignorando uma nova leitura...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
