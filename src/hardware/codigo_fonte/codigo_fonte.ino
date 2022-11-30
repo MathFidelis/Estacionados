@@ -3,6 +3,7 @@
 #include "WiFi.h"
 #include <Wire.h>
 #include <MFRC522.h>
+#include <PubSubClient.h>
 
 // Definindo as portas de saída de dispositivos comuns.
 #define OUTPUT_LED_R 36
@@ -22,8 +23,60 @@ MFRC522 rfid = MFRC522(RFID_SS_SDA, RFID_RST);
 int etapa_atual = 0;
 
 // Instanciando as credenciais do ponto de acesso.
-const char *WIFI_FTM_SSID = "Wifi-Turma-4-Grupo-2";
-const char *WIFI_FTM_PASS = "12345678";
+const char *AP_FTM_SSID = "HelloWorld";
+const char *AP_FTM_PASS = "HelloWorld";
+
+// Instanciando as credenciais do broker MQTT.
+const char *BROKER_MQTT_HOST = "broker.hivemq.com";
+const char *BROKER_MQTT_CLIENT_ID = "7b6e3af9-fee4-4e9e-94ac-662e9020a17d";
+const int   BROKER_MQTT_PORT = 1883;
+
+// Instanciando variáveis para a transmissão MQTT.
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+
+// Ao receber uma mensagem...
+void on_message(char* topic, byte* message, unsigned int length){
+
+  // Quando receber uma mensagem, imprimindo o tópico a qual ela pertence...
+  Serial.println("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(".");
+  Serial.println();
+  
+}
+
+void reconnect() {
+
+  // Loop until we're reconnected
+  while (!client.connected()) {
+
+    Serial.print("Attempting MQTT connection...");
+
+    // Attempt to connect
+    if (client.connect(BROKER_MQTT_CLIENT_ID)) {
+
+      Serial.println("connected");
+
+      // Subscribe
+      client.subscribe("inteli/acender_led");
+
+    } else {
+
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
 
 // -------------------------- Atenção --------------------------
 //
@@ -252,14 +305,13 @@ void setup()
 	Serial.print("\nConectando ao roteador wi-fi");
 
 	// Conectando ao roteador wi-fi...
-	WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
+	WiFi.begin(AP_FTM_SSID, AP_FTM_PASS);
 
 	// Imprimindo um ponto no serial enquanto o wi-fi não conecta.
 	while (WiFi.status() != WL_CONNECTED)
 	{
 
     // Conectando ao roteador wi-fi...
-	  WiFi.begin(WIFI_FTM_SSID, WIFI_FTM_PASS);
 		Serial.print("...");
 		delay(500);
     
@@ -270,6 +322,10 @@ void setup()
 
 	// Imprimindo o status atual do sistema.
 	Serial.println("Wi-fi conectado!");
+
+  // Definindo o servidor MQTT.
+  client.setServer(BROKER_MQTT_HOST, BROKER_MQTT_PORT);
+  client.setCallback(on_message);
 
   // -------------------------- Atenção --------------------------
   //
@@ -307,6 +363,14 @@ void setup()
  */
 void loop()
 {
+
+  if (!client.connected()) {
+
+    reconnect();
+
+  }
+
+  client.loop();
 
 	// Caso não haja um cartão RFID próximo, ou se um cartão RFID permanecer próximo ao sensor, ignorando uma nova leitura...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
