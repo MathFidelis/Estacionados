@@ -29,6 +29,9 @@ export class Order_of_service {
 	accepted_at?: Date;
 
 	@Column({type: "timestamp", nullable: true})
+	liked_at?: Date;
+
+	@Column({type: "timestamp", nullable: true})
 	finished_at?: Date;
 
 	@UpdateDateColumn({type: "timestamp", nullable: false})
