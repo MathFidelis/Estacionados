@@ -35,44 +35,45 @@ const int   BROKER_MQTT_PORT = 1883;
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-long lastMsg = 0;
-char msg[50];
-int value = 0;
-
-// Ao receber uma mensagem...
+/*
+ * Define as ações que devem ser realizadas ao receber uma mensagem MQTT.
+ */
 void on_message(char* topic, byte* message, unsigned int length){
 
-  // Quando receber uma mensagem, imprimindo o tópico a qual ela pertence...
-  Serial.println("Message arrived on topic: ");
+  // Imprimindo o tópico qual ela pertence...
+  Serial.println("Uma nova mensagem foi recebida no tópico ");
   Serial.print(topic);
   Serial.print(".");
   Serial.println();
   
 }
 
+/*
+ * Reconecta ao broker MQTT.
+ */
 void reconnect() {
 
-  // Loop until we're reconnected
+  // Realizando um loop enquanto o cliente estiver desconectado.
   while (!client.connected()) {
 
-    Serial.print("Attempting MQTT connection...");
+    // Imprimindo o status atual do sistema.
+    Serial.print("Tentando conectar ao broker MQTT...");
 
-    // Attempt to connect
+    // Tentando conectar ao servidor.
     if (client.connect(BROKER_MQTT_CLIENT_ID)) {
 
-      Serial.println("connected");
-
-      // Subscribe
-      client.subscribe("inteli/acender_led");
+      Serial.println("Conectado!");
 
     } else {
 
+      // Imprimindo o status atual do sistema.
       Serial.print("failed, rc=");
       Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
+      Serial.println(" tentando novamente em 5 segundos...");
 
-      // Wait 5 seconds before retrying
+      // Aguardando 5 segundos antes de tentar novamente.
       delay(5000);
+
     }
   }
 }
@@ -167,6 +168,7 @@ bool solicitar_um_relatorio_FTM(){
 void tocar_som_de_operacao_realizada()
 {
 
+  // Tocando um som de 300Hz durante 1 segundo.
 	tone(OUTPUT_BUZZER, 3000);
 	delay(1000);
 	noTone(OUTPUT_BUZZER);
@@ -203,6 +205,8 @@ void capturar_RFID()
 
 	// Parando a criptografia no PCD.
 	rfid.PCD_StopCrypto1();
+
+  tocar_som_de_operacao_realizada();
 
 }
 
@@ -342,13 +346,6 @@ void setup()
   // Informando o status atual do sistema.
   Serial.println("Inicializando sessão FTM...");
 
-  // Requisitando relatórios FTM até que um falhe.
-  while(solicitar_um_relatorio_FTM()) {
-
-    Serial.printf("Distância atual: %.2f m\n", (float) distancia_do_roteador_em_metros);
-    delay(1000);
-
-  };
 
   // -------------------------- Atenção --------------------------
   //
@@ -364,13 +361,8 @@ void setup()
 void loop()
 {
 
-  if (!client.connected()) {
-
-    reconnect();
-
-  }
-
-  client.loop();
+  solicitar_um_relatorio_FTM();
+  Serial.printf("Distância atual: %.2f m\n", (float) distancia_do_roteador_em_metros);
 
 	// Caso não haja um cartão RFID próximo, ou se um cartão RFID permanecer próximo ao sensor, ignorando uma nova leitura...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
