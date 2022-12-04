@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../../components/Header/Header';
 import styled from 'styled-components';
 import character from '../../assets/images/character.png';
 import eye from '../../assets/images/eye.svg';
 import search from '../../assets/images/search.svg';
-import Modal from '../../components/AddModal/Modal';
+import Modal from '../../components/AddValletModal/Modal';
+import './Vallets.css';
 
 const Container = styled.div`
 display: flex;
@@ -12,6 +13,7 @@ display: flex;
 
 const Column = styled.div`
 display: flex;
+min-height: 398px;
 flex-direction: column;
 `
 
@@ -71,8 +73,8 @@ align-items: center;
 `
 
 const Tr = styled.tr`
-padding-top: 2rem;
-// padding-left: 4rem;
+border-radius: 0.7rem;
+padding: 1rem;
 font-size: 1.2rem;
 display: flex;
 width: 100%;
@@ -131,7 +133,7 @@ font-weight: 600;
 const TrConstructor = (props) => {
 
     return (
-        <Tr>
+        <Tr className='vallet-line'>
             <Td>{props.name}</Td>
             <Td>{props.parkedAmount}</Td>
             <Td>{props.time}</Td>
@@ -144,7 +146,92 @@ const TrConstructor = (props) => {
 
 function App() {
 
+    const [ teste, setTeste ] = useState([]);
+    useEffect(() => {
+
+        fetch('http://httpbin.org/get')
+        .then(response => {
+        if (response.ok) {
+            return response.json()
+        }
+        throw response
+    })
+    .then(data => (
+        setTeste(
+            [   
+                {
+                    nome: "João Gabriel Peixoto",
+                    carros: 18,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Gabriel Nunes",
+                    carros: 14,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "João Lucas da Conceição",
+                    carros: 14,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Enzo Costa",
+                    carros: 14,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Pedro Lucas Lopes",
+                    carros: 13,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Thales Pires",
+                    carros: 12,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Leandro Moura",
+                    carros: 12,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Caio Cardoso",
+                    carros: 12,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                },
+                {
+                    nome: "Claudio Pereira dos Santos",
+                    carros: 9,
+                    tempoMedio: 6,
+                    cadastro: '20/07/2022'
+                }
+        ,])
+    ))
+    .catch(error => {
+        console.error("Error fetching data: ", error)
+        console.log(error)
+    })
+}, [])
+
+
+    const [ filterVallet, setFilterVallet ] = useState('');
     const [ modalVisible, setModalVisible ] = useState(false);
+
+    const handleFilterVallet = (e) => {
+        setFilterVallet(e.target.value);
+    }
+    
+    const filterVallets = () => {
+        console.log(filterVallet)
+    }
 
     const handleModalVisible = () => {
 
@@ -161,32 +248,32 @@ function App() {
 
     }
 
+
     return (
         <Container>
         <Column>
             <Row className='search' style={{marginTop: '3.5rem'}}>
-                <SearchInput placeholder='Digite um nome...'/>
-                <SearchButton><Img src={search}/></SearchButton><AddButton onClick={handleModalVisible}><P style={{color:'#fff'}}>+</P>Adicionar novo</AddButton>
+                <SearchInput onChange={handleFilterVallet} placeholder='Digite um nome...'/>
+                <SearchButton onClick={()=>{console.log(filterVallet)}}><Img src={search}/></SearchButton><AddButton onClick={handleModalVisible}><P style={{color:'#fff'}}>+</P>Adicionar novo</AddButton>
             </Row>
             <Column>
                 <Table>
                     <Tr style={{marginTop: '1.5rem', marginBottom: '1.5rem;'}}>
-                        <Th>Nome</Th>
-                        <Th>Qtd. carros estacionados</Th>
-                        <Th>Tempo médio por carro</Th>
-                        <Th>Data de cadastro</Th>
-                        <Th></Th>
+                        <Th className="th-cell">Nome </Th>
+                        <Th className="th-cell">Qtd. carros estacionados</Th>
+                        <Th className="th-cell">Tempo médio por carro</Th>
+                        <Th className="th-cell">Data de cadastro</Th>
+                        <Th className="th-cell"></Th>
                     </Tr>
                     <Hr />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
+                    {teste.map((item, index) => {
+                        return <TrConstructor key={index} 
+                                name={item.nome}
+                                parkedAmount={item.carros}
+                                time={`${item.tempoMedio}m`}
+                                date={item.cadastro}
+                        />
+                    })}
                 </Table>
             </Column>
 

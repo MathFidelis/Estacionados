@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import eye from '../../assets/images/queue-eye.svg';
 import './Queue.css';
@@ -32,6 +32,7 @@ margin-right: 2rem;
 
 const Row = styled.div`
 display: flex;
+justify-content: space-between;
 `
 
 const ColumnName = styled.p`
@@ -80,6 +81,7 @@ font-size: 2.5rem;
 
 const RightSide = styled.div`
 display: flex;
+width: 10%;
 justify-content: flex-end;
 `
 
@@ -87,7 +89,7 @@ const Img = styled.img`
 width: 3rem;
 `
 
-function App() {  
+function Queue() {  
 
     const LicensePlateConstructor = (props) => {
 
@@ -95,15 +97,15 @@ function App() {
 
             <LicensePlate className='car-plate'>
                 <Row>
-                <Column stlye={{marginRight:'0'}}>
-                    <P>{props.plate}</P>
-                    <P style={{fontSize:'1.2rem'}}>
-                    há {props.time} minutos
-                    </P>
-                </Column>
-                <RightSide>
-                    <Img src={eye}/>
-                </RightSide>
+                  <Column stlye={{marginRight:'0'}}>
+                      <P>{props.plate}</P>
+                      <P style={{fontSize:'1.2rem'}}>
+                      há {props.time} minutos
+                      </P>
+                  </Column>
+                  <RightSide>
+                      <Img src={eye}/>
+                  </RightSide>
                 </Row>
             </LicensePlate>
 
@@ -111,162 +113,66 @@ function App() {
 
     }
 
-  return <Container>
+    const DoneLicensePlateConstructor = (props) => (
+
+      <DoneLicensePlate className='car-plate'>
+        <Row>
+          <Column stlye={{marginRight:'0'}}>
+            <P>{props.plate}</P>
+            <P style={{fontSize:'1.2rem'}}>
+              há {props.time} minutos
+            </P>
+          </Column>
+          <RightSide>
+            <Img src={eye}/>
+          </RightSide>
+        </Row>
+      </DoneLicensePlate>
+
+    )
+
+    const [ plate, setPlate ] = useState('');
+    const handlePlate = (e) => {
+      setPlate(e.target.value); 
+    }
+
+  return (
+  <Container>
     <Title>Fila</Title>
     <Subtitle>Ordens de Serviço</Subtitle>
     <Main>
       <Column>
         <ColumnName>Placa do veículo</ColumnName>
-        <Input placeholder='AAA-2A22'/>
-        <Button>Buscar</Button>
+        <Input placeholder='AAA-2A22' onChange={handlePlate}/>
+        <Button onClick={()=>{console.log(plate)}}>Buscar</Button>
       </Column>
       <Column>
         <ColumnName>Aguardando estacionar</ColumnName>
           <LicensePlateConstructor plate='KJP-0215' time='2'/>
-          <LicensePlate className='car-plate'>
-            <Row>
-              <Column stlye={{marginRight:'0'}}>
-                <P>AAA-2A22</P>
-                <P style={{fontSize:'1.2rem'}}>
-                  há 2 minutos
-                </P>
-              </Column>
-              <Img src={eye}/>
-            </Row>
-          </LicensePlate>
-          <LicensePlate className='car-plate'>
-            <Row>
-              <Column stlye={{marginRight:'0'}}>
-                <P>AAA-2A22</P>
-                <P style={{fontSize:'1.2rem'}}>
-                  há 2 minutos
-                </P>
-              </Column>
-              <Img src={eye}/>
-            </Row>
-          </LicensePlate>
+          <LicensePlateConstructor plate='AAA-2B22' time='2'/>
+          <LicensePlateConstructor plate='AAA-2B22' time='2'/>
       </Column>
         <Column>
           <ColumnName>Estacionado</ColumnName>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <RightSide>
-                  <Img src={eye}/>
-                </RightSide>
-              </Row>
-            </LicensePlate>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <RightSide>
-                  <Img src={eye}/>
-                </RightSide>
-              </Row>
-            </LicensePlate>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <RightSide>
-                  <Img src={eye}/>
-                </RightSide>
-              </Row>
-            </LicensePlate>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <Img src={eye}/>
-              </Row>
-            </LicensePlate>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <Img src={eye}/>
-              </Row>
-            </LicensePlate>
+          <LicensePlateConstructor plate='AAA-2C22' time='2'/>
+          <LicensePlateConstructor plate='AAA-2D22' time='2'/>
+          <LicensePlateConstructor plate='AAA-2E22' time='2'/>
+          <LicensePlateConstructor plate='AAA-2F22' time='2'/>
+          <LicensePlateConstructor plate='AAA-2G22' time='2'/>
         </Column>
         <Column>
           <ColumnName>Aguardando retirada</ColumnName>
-            <LicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <RightSide>
-                  <Img src={eye}/>
-                </RightSide>
-              </Row>
-            </LicensePlate>
+            <LicensePlateConstructor plate='AAA-2H22' time='2'/>
         </Column>
         <Column>
           <ColumnName>Finalizados nos últimos 10min</ColumnName>
-            <DoneLicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <RightSide>
-                  <Img src={eye}/>
-                </RightSide>
-              </Row>
-            </DoneLicensePlate>
-            <DoneLicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <Img src={eye}/>
-              </Row>
-            </DoneLicensePlate>
-            <DoneLicensePlate className='car-plate'>
-              <Row>
-                <Column stlye={{marginRight:'0'}}>
-                  <P>AAA-2A22</P>
-                  <P style={{fontSize:'1.2rem'}}>
-                    há 2 minutos
-                  </P>
-                </Column>
-                <Img src={eye}/>
-              </Row>
-            </DoneLicensePlate>
+            <DoneLicensePlateConstructor plate='KJP-0215' time='4'/>
+            <DoneLicensePlateConstructor plate='KJP-0215' time='5'/>
+            <DoneLicensePlateConstructor plate='KJP-0215'time='9'/>
         </Column>
     </Main>
   </Container>
-
+  )
 }
 
-export default App;
+export default Queue;

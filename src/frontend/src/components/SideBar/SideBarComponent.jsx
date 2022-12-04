@@ -13,7 +13,7 @@ const items = [
     {
         img: HomeImg,
         pageName: 'Página Inicial',
-        url: '/'
+        url: '/app'
     },
     {
         img: Vallets,
@@ -43,7 +43,7 @@ function SideBar(props) {
                 {
                     items.map((item, index) => {
                         return (
-                            <Link onClick={() => props.changePage(index)} className='menu' to={item.url}>
+                            <Link key={index} onClick={() => props.changePage(index)} className='menu' to={item.url}>
                                 <div className={`menu-item ${props.active === index && 'active'}`} >
                                     <img className='item-image' src={item.img} alt={item.pageName} />
                                     <p className='item-name'>{item.pageName}</p> 
