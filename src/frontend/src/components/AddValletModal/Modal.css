@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
+select:focus {
+    outline: none;
+}
+option {
+
+    padding: 400px !important;
+    background-color: #EEEEEE !important;
+    border: none;
+
+}
+option:hover {
+
+    background-color: #EEEEEE !important;
+
+}
+
+input::placeholder {
+
+    color: #CECECE !important;
+    font-weight:600 !important;
+
+}
+
+select {
+    color: #CECECE;
+    font-weight: 600;
+}

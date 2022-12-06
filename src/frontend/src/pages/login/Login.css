@@ -1,0 +1,24 @@
+input {
+    background-repeat: no-repeat;
+    background-size: 2rem;
+    background-position: 5px;
+}
+
+.toast {
+    font-size: 12px;
+}
+
+#email {
+    background-image: url('../../assets/images/person.svg');
+    text-indent: 2rem;
+}
+
+#password {
+    background-image: url('../../assets/images/password.svg');
+    letter-spacing: 2px;
+    text-indent: 2rem;
+}
+
+#password::placeholder {
+    letter-spacing: normal;
+}

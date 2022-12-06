@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import characterImg from '../../assets/images/character.png';
-import Modal from '../../components/AddModal/Modal'
+import Modal from '../../components/AddValletModal/Modal'
 import arrow from '../../assets/images/arrow.svg';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 function HomePage() {
+
+  useEffect(()=>{
+    let token = sessionStorage.getItem('token');
+    console.log(token);
+  }, [])
 
   const [ modalVisible, setModalVisible ] = useState(false);
   const handleModalVisible = () => {
@@ -53,7 +59,7 @@ font-size: 3rem;
 font-weight: 700;
 `
 
-const Chevron = styled.button`
+const Chevron = styled.div`
   
   display: inline-block;
   margin-right: 6rem;
@@ -184,6 +190,11 @@ cursor: pointer;
 const Br = styled.br`
 `
 
+const [ name, setName ] = useState('');
+const handleName = (e) => {
+  setName(e.target.value);
+}
+
   return (
   <Container>
     <Column>
@@ -194,7 +205,7 @@ const Br = styled.br`
               <Bold>Acompanhar</Bold>
               em tempo real
             </Row>
-            <Link style={{textDecoration:'none'}} to='queue'>
+            <Link style={{textDecoration:'none', width:'10px'}} to='queue'>
             <QueueButton><Img src={arrow} style={{width:'1.5rem'}}/>Fila de <Br /> ordem de serviços</QueueButton>
             </Link>
             <Row style={{marginTop:"2rem"}}>
@@ -225,7 +236,7 @@ const Br = styled.br`
         </Column>
       </Main>
     </Column>
-    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} />}
+    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} name={name} handleName={handleName}/>}
     </Container> 
   )
 

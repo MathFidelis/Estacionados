@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 function Header(props) {
@@ -49,7 +49,6 @@ function Header(props) {
     `
     
     const Chevron = styled.button`
-      
     display: inline-block;
     margin-right: 6rem;
     border-style: solid;
@@ -74,6 +73,33 @@ function Header(props) {
     display: flex;
     justify-content: space-between;
     `
+
+    const [ userData, setUserData ] = useState({});
+    
+    async function getUserData() {
+
+        let id = sessionStorage.getItem('user_id');
+        let token = sessionStorage.getItem('token');
+        console.log(id);
+        const requestSettings = {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        };
+        const response = await fetch(`http://api.estapar.code.br.com:1337/api/v1/user/${id}`, requestSettings)
+        const json = await response.json();
+        setUserData({
+            user_name: "Moises Cazé",
+            role: "Administrador da Unidade"
+        })
+    }
+
+    useEffect(()=>{
+        getUserData();
+    }, [])
+
     return <>
         <Header>
             <Div>
@@ -83,8 +109,8 @@ function Header(props) {
                 </Column>
                 <RightSide>
                 <Column>
-                    <EmployeeName>{props.name}</EmployeeName>
-                    <EmployeeRole>{props.role}</EmployeeRole>
+                    <EmployeeName>{userData.user_name}</EmployeeName>
+                    <EmployeeRole>{userData.role}</EmployeeRole>
                 </Column>
                 <Img src={props.img} />
                 <Chevron/>
