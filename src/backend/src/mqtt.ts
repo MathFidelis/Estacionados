@@ -64,7 +64,7 @@ client.on("connect", function() {
 client.on("message", function(topic, message) {
 
 	
-	console.log(`📨 Message received on topic ${topic}: ${message.toString()}`);
+	console.log(`📨 Message received on topic '${topic}': '${message.toString()}'`);
 
 	if(topic === "Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral") {
 
