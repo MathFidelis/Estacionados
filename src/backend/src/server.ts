@@ -7,6 +7,12 @@ import config from "./config/default";
 // Importing the app data source (database connection information).
 import { AppDataSource } from "./database/data-source";
 
+// Importing the MQTT client.
+import { client  } from "./mqtt";
+
+// Executing the MQTT client.
+client;
+
 // Setting up the application default port and hostname.
 const port = config.port as number;
 const host = config.host as string;
