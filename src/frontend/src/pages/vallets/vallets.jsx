@@ -87,7 +87,7 @@ text-align: flex-start;
 padding-bottom: 2.5rem;
 `
 
-const Hr = styled.hr`
+const Border = styled.tr`
 width: 100%;
 border: 0.1px solid #E8E7E6;
 background-color: rgba(232, 231, 230, 0.5);
@@ -111,6 +111,17 @@ font-size: 1.3rem;
 align-items: center;
 margin: 0 4rem;
 padding-top: 3rem;
+`
+
+const THead = styled.thead`
+display: flex;
+width: 100%;
+margin: 0px 4rem;
+padding: 0 1rem 1rem;
+justify-content: space-between;
+`
+const TBody = styled.tbody`
+width: 100%;
 `
 
 const PageButton = styled.button`
@@ -147,74 +158,28 @@ const TrConstructor = (props) => {
 function App() {
 
     const [ teste, setTeste ] = useState([]);
+
     useEffect(() => {
 
-        fetch('http://httpbin.org/get')
+        let token = sessionStorage.getItem('token');
+        console.log(`Bearer ${token}`);
+
+        const requestSettings = {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+
+        fetch('http://api.estapar.code.br.com:1337/api/v1/user?role=valet', requestSettings)
         .then(response => {
         if (response.ok) {
             return response.json()
         }
         throw response
     })
-    .then(data => (
-        setTeste(
-            [   
-                {
-                    nome: "João Gabriel Peixoto",
-                    carros: 18,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Gabriel Nunes",
-                    carros: 14,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "João Lucas da Conceição",
-                    carros: 14,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Enzo Costa",
-                    carros: 14,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Pedro Lucas Lopes",
-                    carros: 13,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Thales Pires",
-                    carros: 12,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Leandro Moura",
-                    carros: 12,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Caio Cardoso",
-                    carros: 12,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                },
-                {
-                    nome: "Claudio Pereira dos Santos",
-                    carros: 9,
-                    tempoMedio: 6,
-                    cadastro: '20/07/2022'
-                }
-        ,])
-    ))
+    .then(data => console.log(data))
     .catch(error => {
         console.error("Error fetching data: ", error)
         console.log(error)
@@ -258,22 +223,25 @@ function App() {
             </Row>
             <Column>
                 <Table>
-                    <Tr style={{marginTop: '1.5rem', marginBottom: '1.5rem;'}}>
+                    <THead>
+                        <Tr style={{padding: '1rem 0 0 0', marginTop:'1.5rem'}}>
                         <Th className="th-cell">Nome </Th>
                         <Th className="th-cell">Qtd. carros estacionados</Th>
                         <Th className="th-cell">Tempo médio por carro</Th>
                         <Th className="th-cell">Data de cadastro</Th>
                         <Th className="th-cell"></Th>
-                    </Tr>
-                    <Hr />
-                    {teste.map((item, index) => {
-                        return <TrConstructor key={index} 
-                                name={item.nome}
-                                parkedAmount={item.carros}
-                                time={`${item.tempoMedio}m`}
-                                date={item.cadastro}
-                        />
-                    })}
+                        </Tr>
+                    </THead>
+                    <TBody>
+                        {teste.map((item, index) => {
+                            return <TrConstructor key={index} 
+                                    name={item.nome}
+                                    parkedAmount={item.carros}
+                                    time={`${item.tempoMedio}m`}
+                                    date={item.cadastro}
+                                />  
+                        })}
+                    </TBody>
                 </Table>
             </Column>
 

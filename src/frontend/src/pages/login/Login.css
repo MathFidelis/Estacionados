@@ -4,6 +4,10 @@ input {
     background-position: 5px;
 }
 
+.toast {
+    font-size: 12px;
+}
+
 #email {
     background-image: url('../../assets/images/person.svg');
     text-indent: 2rem;

@@ -9,7 +9,7 @@ import axios from 'axios';
 function HomePage() {
 
   useEffect(()=>{
-    let token = sessionStorage.getItem('bearer');
+    let token = sessionStorage.getItem('token');
     console.log(token);
   }, [])
 
@@ -190,10 +190,10 @@ cursor: pointer;
 const Br = styled.br`
 `
 
-  const [ name, setName ] = useState('');
-  const handleName = (e) => {
-    setName(e.target.value);
-  }
+const [ name, setName ] = useState('');
+const handleName = (e) => {
+  setName(e.target.value);
+}
 
   return (
   <Container>
@@ -205,7 +205,7 @@ const Br = styled.br`
               <Bold>Acompanhar</Bold>
               em tempo real
             </Row>
-            <Link style={{textDecoration:'none'}} to='queue'>
+            <Link style={{textDecoration:'none', width:'10px'}} to='queue'>
             <QueueButton><Img src={arrow} style={{width:'1.5rem'}}/>Fila de <Br /> ordem de serviços</QueueButton>
             </Link>
             <Row style={{marginTop:"2rem"}}>
