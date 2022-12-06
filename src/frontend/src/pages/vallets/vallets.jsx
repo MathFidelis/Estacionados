@@ -157,7 +157,7 @@ const TrConstructor = (props) => {
 
 function App() {
 
-    const [ teste, setTeste ] = useState([]);
+    const [ valletsList, setValletsList ] = useState([]);
 
     useEffect(() => {
 
@@ -174,16 +174,18 @@ function App() {
 
         fetch('http://api.estapar.code.br.com:1337/api/v1/user?role=valet', requestSettings)
         .then(response => {
-        if (response.ok) {
             return response.json()
-        }
-        throw response
     })
-    .then(data => console.log(data))
+    .catch(error => {
+
+        console.log(error);
+
+    }).then(data => setValletsList(data.success.data))
     .catch(error => {
         console.error("Error fetching data: ", error)
         console.log(error)
     })
+
 }, [])
 
 
@@ -233,12 +235,12 @@ function App() {
                         </Tr>
                     </THead>
                     <TBody>
-                        {teste.map((item, index) => {
+                        {valletsList.map((item, index) => {
                             return <TrConstructor key={index} 
-                                    name={item.nome}
+                                    name={item.first_name + ' ' + item.last_name}
                                     parkedAmount={item.carros}
                                     time={`${item.tempoMedio}m`}
-                                    date={item.cadastro}
+                                    date={item.created_at.split('T')[0]}
                                 />  
                         })}
                     </TBody>

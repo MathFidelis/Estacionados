@@ -12,12 +12,6 @@
   font-size: 62.5%;
 }
 
-tr:nth-child(2) {
-
-  margin-top: 1rem;
-
-}
-
 tr td:not(:last-child) {
 
   flex: 1;

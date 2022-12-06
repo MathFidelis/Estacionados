@@ -1,7 +1,7 @@
 import React from 'react';
 import character from '../../assets/images/vallet-ranking.png'
 import styled from 'styled-components';
-import './Metrics.css'
+import './Metrics.css';
 
 const Container = styled.div`
 display: flex;
