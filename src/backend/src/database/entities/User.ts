@@ -42,6 +42,9 @@ export class User {
 	@Column({type: "boolean", nullable: false})
 	is_temporary_employee: boolean;
 
+	@Column({type: "varchar", nullable: true})
+	rfid: string;
+
 	@CreateDateColumn({type: "timestamp", nullable: false})
 	created_at?: Date;
 

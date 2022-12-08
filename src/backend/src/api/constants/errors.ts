@@ -70,4 +70,9 @@ export const errors = {
 		title: "Ordem de serviço já finalizada.",
 		description: "A ordem de serviço solicitada já foi finalizada."
 	},
+	your_role_does_not_allow_this_action: {
+		code: 1414,
+		title: "Seu cargo não permite esta ação.",
+		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
+	}
 };
