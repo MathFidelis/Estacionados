@@ -86,8 +86,8 @@ function Login() {
                 errorLoginToast();
             }
         }
-
         request();
+
 
     }
 
@@ -115,13 +115,19 @@ function Login() {
         });
     }
 
+    const checkEnter = (e) => {
+        if (e.keyCode == 13) {
+            postLogin();
+        }
+    }
+
     return (
         <Container>
             <LoginDiv>
                 <Img src={logo} style={{width:'8rem'}} />
                 <Inputs>
-                    <Input type="email" placeholder='E-mail' id="email" onChange={handleEmail} value={userEmail}/>
-                    <Input type="password" placeholder='Senha' id="password" onChange={handlePassword} value={userPassword}/>
+                    <Input type="email" placeholder='E-mail' id="email" onKeyDown={checkEnter} onChange={handleEmail} value={userEmail}/>
+                    <Input type="password" placeholder='Senha' id="password" onKeyDown={checkEnter} onChange={handlePassword} value={userPassword}/>
                 </Inputs>
                 <AcceptButton onClick={postLogin}>Entrar</AcceptButton>
             </LoginDiv>
@@ -137,7 +143,7 @@ function Login() {
                 pauseOnHover
                 theme="light"
                 />
-        <ToastContainer />
+            <ToastContainer />
         </Container>
     )
 

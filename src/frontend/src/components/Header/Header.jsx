@@ -80,7 +80,7 @@ function Header(props) {
 
         let id = sessionStorage.getItem('user_id');
         let token = sessionStorage.getItem('token');
-        console.log(id);
+        console.log(`id: ${id}`);
         const requestSettings = {
             method: 'GET',
             headers: { 
@@ -90,15 +90,23 @@ function Header(props) {
         };
         const response = await fetch(`http://api.estapar.code.br.com:1337/api/v1/user/${id}`, requestSettings)
         const json = await response.json();
-        setUserData({
-            user_name: "Moises Cazé",
-            role: "Administrador da Unidade"
-        })
+        // setUserData(json.success.d)
+        setUserData(json.success.data);
     }
 
     useEffect(()=>{
         getUserData();
     }, [])
+
+    const UserRole = () => {
+        if (userData.role == "manager") {
+            return <>Administrador da Unidade</>
+        } 
+        else if (userData.role == "attendant") {
+            return <>Atendente</>
+        }
+        return <>Manobrista</>
+    }
 
     return <>
         <Header>
@@ -109,8 +117,10 @@ function Header(props) {
                 </Column>
                 <RightSide>
                 <Column>
-                    <EmployeeName>{userData.user_name}</EmployeeName>
-                    <EmployeeRole>{userData.role}</EmployeeRole>
+                    <EmployeeName>{userData.first_name} {userData.last_name}</EmployeeName>
+                    <EmployeeRole>
+                        <UserRole />
+                    </EmployeeRole>
                 </Column>
                 <Img src={props.img} />
                 <Chevron/>

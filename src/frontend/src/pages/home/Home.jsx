@@ -4,13 +4,12 @@ import characterImg from '../../assets/images/character.png';
 import Modal from '../../components/AddValletModal/Modal'
 import arrow from '../../assets/images/arrow.svg';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 
 function HomePage() {
 
   useEffect(()=>{
     let token = sessionStorage.getItem('token');
-    console.log(token);
+    console.log('peguei o token - home');
   }, [])
 
   const [ modalVisible, setModalVisible ] = useState(false);

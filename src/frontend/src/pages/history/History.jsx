@@ -144,89 +144,38 @@ const TrConstructor = (props) => {
 
 function History() {
 
-    const [ history, setHistory ] = useState([]);
-
-    useEffect(()=>{
-        setHistory([
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Saída',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'Henrique Dias',
-                type: 'Entrada',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Lucas',
-                type: 'Saída',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Entrada',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Saída',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Entrada',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Saída',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Entrada',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-            {
-                name: 'João Gabriel Peixoto',
-                type: 'Entrada',
-                timeStarted:'14:58:59',
-                timeFinished: '15:00:00',
-                date:'02/12/2022',
-                vehiclePlate:'KJP-0215'
-            },
-        ]);
-    },[])
-
+    const [ historyList, setHistoryList ] = useState([]);
     const [ name, setName ] = useState('');
     const handleName = (e) => {
         setName(e.target.value);
     }
+
+    useEffect(()=>{
+
+    let token = sessionStorage.getItem('token');
+    console.log(`Bearer ${token}`);
+    const requestSettings = {
+        method: 'GET',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        }
+    }
+
+    fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=accepted', requestSettings)
+    .then(response => {
+        return response.json()
+    })
+    .catch(error => {
+
+        console.log(error);
+
+    }).then(data => setHistoryList(data.success.data))
+    .catch(error => {
+        console.error("Error fetching data: ", error)
+        console.log(error)
+    })
+}, [])
 
     return (
         <Container>
@@ -250,9 +199,10 @@ function History() {
                     </THead>
                     <TBody>
                         {
-                            history.map((item,index) => {
+                            historyList.map((item,index) => {
                                 return <TrConstructor clasName="history-line"
-                                    key={index} name={item.name}
+                                    key={index} 
+                                    name={item.name}
                                     type={item.type}
                                     timeStarted={item.timeStarted}
                                     timeFinished={item.timeFinished}
