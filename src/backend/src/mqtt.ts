@@ -1,4 +1,7 @@
 import * as mqtt from "mqtt";
+import { AppDataSource } from "./database/data-source";
+import { Order_of_service } from "./database/entities/Order_of_service";
+import { User } from "./database/entities/User";
 
 const mqttBroker = `mqtt://${process.env.MQTT_HOST}:${process.env.MQTT_PORT}`; // MQTT Broker URL
 
@@ -61,14 +64,45 @@ client.on("connect", function() {
 
 });
 
-client.on("message", function(topic, message) {
+client.on("message", async function(topic, message) {
 
+	// Converting the received topic and message to string.
+	const topicStr = topic.toString();
+	const messageStr = message.toString();
+
+	// Logging the received topic and message.
+	console.log(`📨 Message received on topic '${topicStr}': '${messageStr}'`);
+
+	// Defining the algorithm to be executed when a message is received on the topic below.
+	if(topicStr === "Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral") {
+
+		// Getting the order of service by the received rfid.
+		const orderOfService = await AppDataSource.getRepository(Order_of_service).findOneBy({user: {rfid : message.toString()}, status: "accepted", type: "entry"});
+
+		// If has no entrance order of service associated with the rfid...
+		if(!orderOfService) {
+
+			// Publishing a message to the topic 'Estapar/OrdemDeServicoDeEntradaNaoEncontrada'.
+			client.publish("Estapar/OrdemDeServicoDeEntradaNaoEncontrada", "Ordem de serviço de entrada não encontrada.");
+
+
+		} else {
+
+			// Publishing a message to the topic 'Estapar/OrdemDeServicoDeEntradaEncontrada'.
+			client.publish("Estapar/OrdemDeServicoDeEntradaEncontrada", orderOfService.id.toString());
+
+			// Saving the linked date of the order of service.
+			await AppDataSource.getRepository(Order_of_service).update(orderOfService.id, {linked_at : new Date()});
+
+		}
+
+		
 	
-	console.log(`📨 Message received on topic '${topic}': '${message.toString()}'`);
+	}
 
-	if(topic === "Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral") {
+	if(topicStr === "Estapar/CarroEstacionado") {
 
-		// TODO: Implementar a lógica de vincular a ordem de serviço de entrada com o bloco central.
+		await AppDataSource.getRepository(Order_of_service).update(messageStr, {status: "finished", finished_at : new Date()});
 	
 	}
 
