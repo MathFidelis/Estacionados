@@ -81,7 +81,10 @@ export class Order_of_service {
 		order_of_service.id = data.id;
 
 		// Getting the user by email address.
-		const order_of_service_found = await AppDataSource.getRepository(Order_of_service).findOneBy({id: order_of_service.id});
+		const order_of_service_found = await AppDataSource.getRepository(Order_of_service).findOne({where: {id: order_of_service.id}, relations: ["user"]});
+
+		// Deleting the user password.
+		delete order_of_service_found.user.password;
 
 		// Returning the user found.
 		return order_of_service_found;
@@ -98,9 +101,14 @@ export class Order_of_service {
 
 		});
 
-		console.log(query);
+		const orders_of_services = await AppDataSource.getRepository(Order_of_service).find({where: query, relations: ["user"]});
 
-		const orders_of_services = await AppDataSource.getRepository(Order_of_service).find({where: query});
+		orders_of_services.forEach(order_of_service => {
+
+			// Deleting the user password.
+			delete order_of_service.user.password;
+
+		});
 
 		return orders_of_services;
 
