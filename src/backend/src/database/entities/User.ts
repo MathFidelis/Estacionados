@@ -189,4 +189,17 @@ export class User {
 
 	}
 
+	async setRFID(user_id : string, rfid : string) {
+
+		// Saving the user in the database.
+		const user = await AppDataSource.getRepository(User).update({id: user_id}, {rfid: rfid});
+
+		// Getting the user by email address.
+		const updatedUser = await AppDataSource.getRepository(User).findOneBy({id: user_id});
+
+		// Returning the user.
+		return updatedUser;
+
+	}
+
 }

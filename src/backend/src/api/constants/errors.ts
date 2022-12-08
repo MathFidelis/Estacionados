@@ -13,7 +13,7 @@ export const errors = {
 	user_not_found: {
 		code: 1402,
 		title: "Usuário não encontrado.",
-		description: "O endereço de e-mail informado não encontra-se vinculado a nenhuma conta."
+		description: "A informação passada não encontra-se vinculada a nenhuma conta."
 	},
 	invalid_password: {
 		code: 1403,
@@ -74,5 +74,15 @@ export const errors = {
 		code: 1414,
 		title: "Seu cargo não permite esta ação.",
 		description: "A ação solicitada não pôde ser executada devido a falta de permissão."
-	}
+	},
+	no_user_id_provided: {
+		code: 1415,
+		title: "Nenhum ID de usuário fornecido.",
+		description: "Nenhum ID de usuário foi fornecido."
+	},
+	no_rfid_provided: {
+		code: 1416,
+		title: "Nenhum RFID fornecido.",
+		description: "Nenhum RFID foi fornecido."
+	},
 };

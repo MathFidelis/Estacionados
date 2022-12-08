@@ -250,6 +250,97 @@ export const UserService =  {
 
 		}
 	
+	},
+
+	async setRFID(user_id : string, rfid : string) {
+
+		if(!user_id) {
+
+			return {
+				status: 400,
+				error: {
+					code: errors.no_user_id_provided.code,
+					title: errors.no_user_id_provided.title,
+					description: errors.no_user_id_provided.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+		
+		}
+
+		if (!rfid) {
+
+			return {
+				status: 400,
+				error: {
+					code: errors.no_rfid_provided.code,
+					title: errors.no_rfid_provided.title,
+					description: errors.no_rfid_provided.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+		
+		}
+
+		try {
+
+			// Getting the user from database.
+			const target_user = await user.getUserById({id: user_id});
+
+			// Checking if the user exists.
+			if(!target_user) {
+				
+				return {
+					status: 404,
+					error: {
+						code: errors.user_not_found.code,
+						title: errors.user_not_found.title,
+						description: errors.user_not_found.description,
+						source: {
+							pointer: __filename,
+							line: getCurrentLine().line
+						}
+					}
+				};
+
+			}
+
+			// Updating the user rfid.
+			const updatedUser = await user.setRFID(user_id, rfid);
+
+			// Returning the updated user.
+			return {
+				status: 200, 
+				success: {
+					code: success.rfid_set.code,
+					title: success.rfid_set.title,
+					data: updatedUser,
+				}
+			};
+
+		} catch (error) {
+		
+			return {
+				status: 500,
+				error: {
+					code: errors.internal_server_error.code,
+					title: errors.internal_server_error.title,
+					description: errors.internal_server_error.description,
+					source: {
+						pointer: __filename,
+						line: getCurrentLine().line
+					}
+				}
+			};
+
+		}
+	
 	}
 
 };
