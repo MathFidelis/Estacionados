@@ -8,17 +8,10 @@ input {
     font-size: 12px;
 }
 
-#email {
-    background-image: url('../../assets/images/person.svg');
-    text-indent: 2rem;
-}
-
 #password {
-    background-image: url('../../assets/images/password.svg');
-    letter-spacing: 2px;
-    text-indent: 2rem;
+    letter-spacing: 1px;
 }
 
 #password::placeholder {
-    letter-spacing: normal;
+    letter-spacing: 2px;
 }

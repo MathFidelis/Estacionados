@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import eye from '../../assets/images/eye.svg';
 import search from '../../assets/images/search.svg';
-import '../../components/Global.css'
-import './History.css'
+import '../../components/Global.css';
+import './History.css';
+import AddOS from '../../components/add_order/AddOS';
 
 const Tr = styled.tr`
 border-radius: 0.7rem;
@@ -50,6 +51,22 @@ display: flex;
 align-items: center;
 margin-left: 1rem;
 justify-content: center;
+`
+
+const CreateOS = styled.button`
+cursor: pointer;
+display: flex;
+text-align: center;
+align-items: center;
+justify-content: center;
+border: none;
+font-size: 1.3rem;
+width: 15rem;
+background-color: #70D44B;
+height: 4rem;
+color: #fff;
+border-radius: 0.8rem;
+margin-left: 1rem;
 `
 
 const Table = styled.table`
@@ -150,10 +167,19 @@ function History() {
         setName(e.target.value);
     }
 
+    const [ modalVisible, setModalVisible ] = useState(false);
+    const handleModalVisible = () => {
+        if (modalVisible == false) {
+            setModalVisible(true);
+        }
+        else {
+            setModalVisible(false);
+        }
+    }
+
     useEffect(()=>{
 
     let token = sessionStorage.getItem('token');
-    console.log(`Bearer ${token}`);
     const requestSettings = {
         method: 'GET',
         headers: { 
@@ -170,12 +196,24 @@ function History() {
 
         console.log(error);
 
-    }).then(data => setHistoryList(data.success.data))
+    })
+    .then(data => setHistoryList(data.success.data))
     .catch(error => {
         console.error("Error fetching data: ", error)
-        console.log(error)
     })
 }, [])
+
+    const getMonthDate = (time) => {
+        let date = new Date(time);
+        return (`${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`)
+    }
+
+    const getHourMinute = (time) => {
+        let date = new Date(time);
+        console.log(time);
+        console.log(date);
+        return (`${date.getHours()}:${date.getMinutes()}`)
+    }
 
     return (
         <Container>
@@ -183,6 +221,7 @@ function History() {
                 <Row className='search' style={{marginTop: '3.5rem'}}>
                     <SearchInput placeholder='Digite um nome...' onChange={handleName} />
                     <SearchButton onClick={()=>{console.log(name)}}><Img src={search}/></SearchButton>
+                    <CreateOS onClick={handleModalVisible}><P style={{color:'#fff'}}>+</P>Adicionar novo</CreateOS>
                 </Row>
                 <Column>
                 <Table>
@@ -202,12 +241,12 @@ function History() {
                             historyList.map((item,index) => {
                                 return <TrConstructor clasName="history-line"
                                     key={index} 
-                                    name={item.name}
-                                    type={item.type}
-                                    timeStarted={item.timeStarted}
-                                    timeFinished={item.timeFinished}
-                                    date={item.date}
-                                    vehiclePlate={item.vehiclePlate}
+                                    name={`${item.user.first_name} ${item.user.last_name}`}
+                                    type={item.type === 'entry' ? 'Entrada' : 'Saída'}
+                                    date={getMonthDate(item.created_at)}
+                                    timeStarted={getHourMinute(item.accepted_at)}
+                                    timeFinished={getHourMinute(item.finished_at)}
+                                    vehiclePlate={item.vehicle_plate}
                                 />
                             })
                         }
@@ -224,6 +263,7 @@ function History() {
                     <PageButton>43</PageButton>
                 </PagesDiv>
             </Column>
+            {modalVisible && <AddOS handleModalVisible={handleModalVisible} />}
     </Container>
     )
     

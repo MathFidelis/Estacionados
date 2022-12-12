@@ -22,7 +22,7 @@ const items = [
     },
     {
         img: History,
-        pageName: 'Histórico',
+        pageName: 'O. de serviço',
         url: '/history'
     },
     {

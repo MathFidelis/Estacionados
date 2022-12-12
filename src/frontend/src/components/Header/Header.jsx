@@ -80,7 +80,6 @@ function Header(props) {
 
         let id = sessionStorage.getItem('user_id');
         let token = sessionStorage.getItem('token');
-        console.log(`id: ${id}`);
         const requestSettings = {
             method: 'GET',
             headers: { 
@@ -88,15 +87,23 @@ function Header(props) {
                 'Authorization': `Bearer ${token}`,
             }
         };
-        const response = await fetch(`http://api.estapar.code.br.com:1337/api/v1/user/${id}`, requestSettings)
-        const json = await response.json();
-        // setUserData(json.success.d)
-        setUserData(json.success.data);
+        fetch(`http://api.estapar.code.br.com:1337/api/v1/user/${id}`, requestSettings)
+        .then(response => {
+            return response.json()
+        })
+        .catch(error => {
+    
+            console.log(error);
+    
+        }).then(data => setUserData(data.success.data))
+        .catch(error => {
+            console.error("Error fetching data: ", error)
+        })
     }
 
-    useEffect(()=>{
-        getUserData();
-    }, [])
+    // useEffect(()=>{
+    //     getUserData();
+    // }, [])
 
     const UserRole = () => {
         if (userData.role == "manager") {

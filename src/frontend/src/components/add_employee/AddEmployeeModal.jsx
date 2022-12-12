@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import './Modal.css';
+import ModalStructure from '../modal_structure/Modal';
+import './AddEmployeeModal.css';
 
 const Inputs = styled.div`
 display: flex;
@@ -40,8 +41,15 @@ const Row = styled.div`
 display:flex;
 `
 
-const P = styled.p`
+const Title = styled.p`
 font-size: 2.5rem;
+font-weight: 700;
+padding-right: 0.3rem;
+`
+
+const Subtitle = styled.p`
+font-size: 1.4rem;
+margin-top: 2rem;
 font-weight: 400;
 padding-right: 0.3rem;
 `
@@ -69,7 +77,7 @@ background-color: #fff;
 border-radius: 16px;
 `
 
-const AddValletButton = styled(CloseButton)`
+const AddEmployee = styled(CloseButton)`
 width: 18rem;
 background-color: #70D44B; 
 `
@@ -87,11 +95,15 @@ padding: 1rem;
 height: 200px;
 `
 
+const Bold = styled.b`
+margin-right: 0.4rem;
+`
 
 
-function Modal(props) {
 
-    const addVallet = async () => {
+function AddEmployeeModal(props) {
+
+    const addEmployee = async () => {
 
         let names = user_name.split(' ');
         const requestSettings = {
@@ -118,15 +130,6 @@ function Modal(props) {
             temporário: ${isTemporary}
             `
         )
-
-        // const response = await fetch('http://api.estapar.code.br.com:1337/api/v1/user', requestSettings)
-        
-        // nome: ${user_name}
-        // cpf: ${cpf}
-        // rg: ${identityNumber}
-        // data de nascimento: ${birthDate}
-        // carteira: ${driverLicenseType}
-        // tipo: ${isTemporary}
     
     }
 
@@ -162,39 +165,37 @@ function Modal(props) {
     
 
     return (
-        <ModalBackground>
-            <ModalArea>
-                <P style={{fontWeight:'700'}}>Adicionar novo</P>
-                <P style={{fontSize: '1.4rem', marginTop: '2rem'}}><b style={{marginRight: '0.4rem'}}>Crie</b>manobristas na plataforma e otimize a tomada <br />de ordens de serviço</P>
-                <Inputs>
-                    <Label htmlFor='name'>Nome</Label>
-                    <ModalInput value={user_name} onChange={handleName} className='modal-input' placeholder='José da Silva' />
-                    <Label htmlFor='cpf'>CPF</Label>
-                    <ModalInput onChange={handleCpf} type={'text'} className='modal-input' name='cpf' placeholder='000.000.000-00' />
-                    <Label htmlFor='identity-number'>Identidade</Label>
-                    <ModalInput onChange={handleIdentityNumber} type={'text'} className='modal-input' name='identity-number' placeholder='000.000-00' />
-                    <Label htmlFor='birth-date'>Data de nascimento</Label>
-                    <ModalInput onChange={handleBirthDate} type={'text'} className='modal-input' name='birth-date' placeholder='DD/MM/YYYY' />
-                    <Label htmlFor='driver-license-type'>Tipo de carteira de habilitação</Label>
-                    <Select onChange={handleDriverLicenseType}>
-                        <Option value={'A'}>A</Option>
-                        <Option value={'B'}>B</Option>
-                        <Option value={'AB'}>AB</Option>
-                    </Select>
-                    <Label htmlFor='isTemporary'>Tipo do manobrista</Label>
-                    <Select onChange={handleIsTemporary}>
-                        <Option value={'Temporário'}>Temporário</Option>
-                        <Option>Efetivado</Option>
-                    </Select>
-                    <Row style={{justifyContent:'space-between', paddingTop:'1.3rem'}}>
-                        <CloseButton onClick={props.handleModalVisible}>Fechar</CloseButton>
-                        <AddValletButton onClick={addVallet}>Adicionar manobrista</AddValletButton>
-                    </Row>
-                </Inputs>
-            </ModalArea>
-        </ModalBackground>
+        <ModalStructure handleModalVisible={props.handleModalVisible}>
+            <Title>Adicionar novo</Title>
+            <Subtitle><Bold>Crie</Bold>manobristas na plataforma e otimize a tomada <br />de ordens de serviço</Subtitle>
+            <Inputs>
+                <Label htmlFor='name'>Nome</Label>
+                <ModalInput value={user_name} onChange={handleName} className='modal-input' placeholder='José da Silva' />
+                <Label htmlFor='cpf'>CPF</Label>
+                <ModalInput onChange={handleCpf} type={'text'} className='modal-input' name='cpf' placeholder='000.000.000-00' />
+                <Label htmlFor='identity-number'>Identidade</Label>
+                <ModalInput onChange={handleIdentityNumber} type={'text'} className='modal-input' name='identity-number' placeholder='000.000-00' />
+                <Label htmlFor='birth-date'>Data de nascimento</Label>
+                <ModalInput onChange={handleBirthDate} type={'text'} className='modal-input' name='birth-date' placeholder='DD/MM/YYYY' />
+                <Label htmlFor='driver-license-type'>Tipo de carteira de habilitação</Label>
+                <Select onChange={handleDriverLicenseType}>
+                    <Option value={'A'}>A</Option>
+                    <Option value={'B'}>B</Option>
+                    <Option value={'AB'}>AB</Option>
+                </Select>
+                <Label htmlFor='isTemporary'>Tipo do manobrista</Label>
+                <Select onChange={handleIsTemporary}>
+                    <Option value={'Temporário'}>Temporário</Option>
+                    <Option>Efetivado</Option>
+                </Select>
+                <Row style={{justifyContent:'space-between', paddingTop:'1.3rem'}}>
+                    <CloseButton onClick={props.handleModalVisible}>Fechar</CloseButton>
+                    <AddEmployee onClick={addEmployee}>Adicionar manobrista</AddEmployee>
+                </Row>
+            </Inputs>
+        </ModalStructure>
     )
 
 }
 
-export default Modal;
+export default AddEmployeeModal;
