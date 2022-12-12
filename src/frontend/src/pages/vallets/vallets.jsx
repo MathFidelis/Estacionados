@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../components/Header/Header';
+import Header from '../../components/header/Header';
 import styled from 'styled-components';
 import character from '../../assets/images/character.png';
 import eye from '../../assets/images/eye.svg';
 import search from '../../assets/images/search.svg';
-import Modal from '../../components/AddValletModal/Modal';
+import AddEmployeeModal from '../../components/add_employee/AddEmployeeModal';
 import './Vallets.css';
 
 const Container = styled.div`
@@ -162,7 +162,6 @@ function App() {
     useEffect(() => {
 
         let token = sessionStorage.getItem('token');
-        console.log(`Bearer ${token}`);
 
         const requestSettings = {
             method: 'GET',
@@ -183,7 +182,6 @@ function App() {
     }).then(data => setValletsList(data.success.data))
     .catch(error => {
         console.error("Error fetching data: ", error)
-        console.log(error)
     })
 
 }, [])
@@ -221,7 +219,13 @@ function App() {
         <Column>
             <Row className='search' style={{marginTop: '3.5rem'}}>
                 <SearchInput onChange={handleFilterVallet} placeholder='Digite um nome...'/>
-                <SearchButton onClick={()=>{console.log(filterVallet)}}><Img src={search}/></SearchButton><AddButton onClick={handleModalVisible}><P style={{color:'#fff'}}>+</P>Adicionar novo</AddButton>
+                <SearchButton onClick={()=>{console.log(filterVallet)}}>
+                    <Img src={search}/>
+                </SearchButton>
+                <AddButton onClick={handleModalVisible}>
+                    <P style={{color:'#fff'}}>+</P>
+                    Adicionar novo
+                </AddButton>
             </Row>
             <Column>
                 <Table>
@@ -258,7 +262,10 @@ function App() {
             </PagesDiv>
 
         </Column>
-    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} />}
+        {modalVisible === true &&
+      <AddEmployeeModal 
+        handleModalVisible={handleModalVisible} 
+      />}
     </Container>
     )
     

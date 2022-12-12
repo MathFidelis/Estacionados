@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import characterImg from '../../assets/images/character.png';
-import Modal from '../../components/AddValletModal/Modal'
+import AddEmployeeModal from '../../components/add_employee/AddEmployeeModal';
 import arrow from '../../assets/images/arrow.svg';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +9,6 @@ function HomePage() {
 
   useEffect(()=>{
     let token = sessionStorage.getItem('token');
-    console.log('peguei o token - home');
   }, [])
 
   const [ modalVisible, setModalVisible ] = useState(false);
@@ -235,7 +234,12 @@ const handleName = (e) => {
         </Column>
       </Main>
     </Column>
-    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} name={name} handleName={handleName}/>}
+    {modalVisible === true &&
+      <AddEmployeeModal 
+        handleModalVisible={handleModalVisible} 
+        name={name} 
+        handleName={handleName}
+      />}
     </Container> 
   )
 

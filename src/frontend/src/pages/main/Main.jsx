@@ -8,7 +8,8 @@ import Header from '../../components/Header/Header';
 import History from '../history/History';
 import Vallets from '../vallets/vallets';
 import Metrics from '../metrics/Metrics';
-import Queue from '../queue/Queue';
+import PageNotFound from '../page_not_found/PageNotFound';
+import ValletQueue from '../vallet_queue/ValletQueue.jsx';
 
 const Main = () => {
 
@@ -18,7 +19,7 @@ const Main = () => {
         setActive(index)
     }
 
-    const pages = ['Painel Administrativo', 'Manobristas', 'Histórico', 'Métricas'];
+    const pages = ['Painel Administrativo', 'Manobristas', 'Ordens de serviço', 'Métricas'];
 
     return (
         <div id="main">
@@ -31,7 +32,7 @@ const Main = () => {
                     <Route path='/vallets' element={<Vallets />} />
                     <Route path='/history' element={<History />} />
                     <Route path='/metrics' element={<Metrics />} />
-                    <Route path='/app/queue' element={<Queue />} />
+                    <Route path='/app/queue' element={<ValletQueue />} />
                 </Routes>
             </div>
         </div>

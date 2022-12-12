@@ -47,16 +47,26 @@ border: none;
 border-radius: 10px;
 width: 70%;
 padding-left: 1rem;
-    `
+`
+
+const P = styled.p`
+font-size: 22px;
+`
+
+const Label = styled.label`
+font-size: 13px;
+width: 70%;
+`
 
 const AcceptButton = styled.button`
 background-color: #70D44B;
 margin-top: -2rem;
 border: none;
 border-radius: 10px;
+width: 70%;
 padding: 1rem 3.5rem 1rem 3.5rem;
 color: #fff;
-font-weight: 600;
+font-weight: 500;
 `
 
 function Login() {
@@ -76,10 +86,11 @@ function Login() {
         const request = async () => {
             const response = await fetch('http://api.estapar.code.br.com:1337/api/v1/user/auth', requestSettings)
             const json = await response.json();
-            console.log(json);
             if (json.status == 200) {
+                console.log(json.success.data);
                 sessionStorage.setItem('user_id', json.success.data.id);
                 sessionStorage.setItem('token', json.success.data.token);
+                sessionStorage.setItem('role', json.success.data.role);
                 document.location = '/app';
             }
             else {
@@ -101,7 +112,7 @@ function Login() {
             setUserPassword(e.target.value);
     }
     // Toast para erro de login
-    const errorLoginToast = () => {
+    const errorLoginToast = (props) => {
         toast.error('Email ou senha incorretos', {
             position: "top-right",
             autoClose: 5000,
@@ -125,11 +136,14 @@ function Login() {
         <Container>
             <LoginDiv>
                 <Img src={logo} style={{width:'8rem'}} />
+                <P style={{fontSize: '20px'}}>Faça seu login</P>
                 <Inputs>
-                    <Input type="email" placeholder='E-mail' id="email" onKeyDown={checkEnter} onChange={handleEmail} value={userEmail}/>
-                    <Input type="password" placeholder='Senha' id="password" onKeyDown={checkEnter} onChange={handlePassword} value={userPassword}/>
+                    <Label htmlFor="">E-mail</Label>
+                    <Input type="email" placeholder='contato@seudominio.com.br' id="email" onKeyDown={checkEnter} onChange={handleEmail} value={userEmail}/>
+                    <Label htmlFor="">Senha</Label>
+                    <Input type="password" placeholder='***********' id="password" onKeyDown={checkEnter} onChange={handlePassword} value={userPassword}/>
                 </Inputs>
-                <AcceptButton onClick={postLogin}>Entrar</AcceptButton>
+                <AcceptButton onClick={postLogin}>Fazer login</AcceptButton>
             </LoginDiv>
             <ToastContainer
                 position="top-right"
