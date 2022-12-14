@@ -71,7 +71,7 @@ client.on("message", async function(topic, message) {
 	const messageStr = message.toString();
 
 	// Logging the received topic and message.
-	console.log(`📨 Message received on topic '${topicStr}': '${messageStr}'`);
+	console.log(`\n📨 Message received on topic '${topicStr}': '${messageStr}'`);
 
 	// Defining the algorithm to be executed when a message is received on the topic below.
 	if(topicStr === "Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral") {
@@ -83,7 +83,10 @@ client.on("message", async function(topic, message) {
 		if(!orderOfService) {
 
 			// Publishing a message to the topic 'Estapar/OrdemDeServicoDeEntradaNaoEncontrada'.
-			client.publish("Estapar/OrdemDeServicoDeEntradaNaoEncontrada", "Ordem de serviço de entrada não encontrada.");
+			client.publish("Estapar/OrdemDeServicoDeEntradaNaoEncontrada", "Error: there was not any entry order of service linked to the inputed RFID!");
+			
+			// Logging the error.
+			console.error("🚨 Error: there was not any entry order of service linked to the inputed RFID!");
 
 
 		} else {
@@ -103,6 +106,42 @@ client.on("message", async function(topic, message) {
 	if(topicStr === "Estapar/CarroEstacionado") {
 
 		await AppDataSource.getRepository(Order_of_service).update(messageStr, {status: "finished", finished_at : new Date()});
+	
+	}
+
+	if(topicStr === "Estapar/VincularOrdemDeServicoDeSaidaComBlocoCentral") {
+
+		// Getting the order of service by the received rfid.
+		const orderOfService = await AppDataSource.getRepository(Order_of_service).findOneBy({user: {rfid : message.toString()}, status: "accepted", type: "exit"});
+
+		// If has no entrance order of service associated with the rfid...
+		if(!orderOfService) {
+
+			// Publishing a message to the topic 'Estapar/OrdemDeServicoDeSaidaNaoEncontrada'.
+			client.publish("Estapar/OrdemDeServicoDeSaidaNaoEncontrada", "Error: there was not any exit order of service linked to the inputed RFID!");
+
+			// Logging the error.
+			console.error("🚨 Error: there was not any exit order of service linked to the inputed RFID!");
+
+		} else {
+
+
+			// Publishing a message to the topic 'Estapar/OrdemDeServicoDeSaidaEncontrada'.
+			client.publish("Estapar/OrdemDeServicoDeSaidaEncontrada", orderOfService.id.toString());
+
+			// Saving the linked date of the order of service.
+			await AppDataSource.getRepository(Order_of_service).update(orderOfService.id, {linked_at : new Date()});
+
+
+		}
+
+	}
+
+	if(topicStr === "Estapar/CarroEntregue") {
+		
+		await AppDataSource.getRepository(Order_of_service).update(messageStr, {status: "finished", finished_at : new Date()});
+
+		client.publish("Estapar/LiberarDispositivo", "Liberar dispositivo");
 	
 	}
 
