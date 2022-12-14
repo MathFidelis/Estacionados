@@ -3,7 +3,7 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 
-// String
+// Importing all required libraries to use string methods.
 #include <String.h>
 
 // Importing all required libraries to RFID reader.
@@ -27,10 +27,14 @@ MFRC522 rfid = MFRC522(RFID_SS_SDA, RFID_RST);
 #define OUTPUT_LED_2_B 39
 
 // Defining the hardware stages...
-#define WAITING_VALET_LINK_RFID_TO_SET_ORDER_OF_SERVICE 0
-#define WAITING_ENTRANCE_SERVER_RESPONSE_WITH_THE_ORDER_OF_SERVICE_ID 1
-#define WAITING_CAR_PARKING 2
-#define CAR_PARKED 3
+#define ENTRY__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE 0
+#define ENTRY__WAITING_SERVER_RESPONSE 1
+#define ENTRY__WAITING_CAR_PARKING 2
+#define ENTRY__CAR_PARKED 3
+#define EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE 4
+#define EXIT__WAITING_SERVER_RESPONSE 5
+#define EXIT__WAITING_CAR_DELIVERY 6
+#define EXIT__CAR_DELIVERED 7
 
 
 // Instancing the primary WiFi credentials.
@@ -49,12 +53,18 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Instancing the current step variable to store at which stage of the flow we are in.
-int hardware_stage = WAITING_VALET_LINK_RFID_TO_SET_ORDER_OF_SERVICE;
+int hardware_stage = ENTRY__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
 
 // Intancing buffers to store the ids of orders of service to be linked to this device. 
 String entry_order_of_service_id = "";
 String exit_order_of_service_id = "";
 
+// Instancing a memory space to store the RFID read.
+String strRFID = "";
+
+/*
+ * Settuping the circuit.
+ */
 void setup() {
 
   // Setting up the frequency of the serial port.
@@ -80,6 +90,9 @@ void setup() {
 
 }
 
+/*
+ * Setupping leds.
+ */
 void setup_leds() {
 
   pinMode(OUTPUT_LED_1_R, OUTPUT);
@@ -98,6 +111,9 @@ void setup_leds() {
 
 }
 
+/*
+ * Setupping wifi.
+ */
 void setup_wifi() {
 
   // Waiting 10 miliseconds to avoid bugs...
@@ -133,6 +149,9 @@ void setup_wifi() {
 
 }
 
+/*
+ * Setupping mqtt.
+ */
 void setup_mqtt() 
 {
 
@@ -144,6 +163,9 @@ void setup_mqtt()
 
 }
 
+/*
+ * Setupping rfid.
+ */
 void setup_rfid() 
 {
 
@@ -155,50 +177,14 @@ void setup_rfid()
 
 }
 
+/*
+ * Instancing a function to be called when the circuit needs to emit an error,
+ * pulsing the led one as red and the buzzer three times.
+ */
+void emit_error() {
 
-void on_message(char* topic, byte* message, unsigned int length) 
-{
-
-  // Printing on receive a message...
-  Serial.print("\nMessage arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(".");
-
-
-  Serial.print("\nMessage: ");
-
-  String messageTemp;
-  
-  // Mouting the message...
-  for (int i = 0; i < length; i++) {
-    messageTemp += (char)message[i];
-  }
-
-  Serial.print(messageTemp);
-  Serial.println("");
-
-  if(hardware_stage == WAITING_ENTRANCE_SERVER_RESPONSE_WITH_THE_ORDER_OF_SERVICE_ID &&  strcmp(topic, "Estapar/OrdemDeServicoDeEntradaEncontrada") == 0) {
-
-    entry_order_of_service_id = messageTemp;
-
-    // Turning on LED 1 as blue.
-    digitalWrite(OUTPUT_LED_1_R, LOW);
-    digitalWrite(OUTPUT_LED_1_G, LOW);
-    digitalWrite(OUTPUT_LED_1_B, HIGH);
-
-    // Turning on LED 2 as yellow.
-    digitalWrite(OUTPUT_LED_2_R, HIGH);
-    digitalWrite(OUTPUT_LED_2_G, HIGH);
-    digitalWrite(OUTPUT_LED_2_B, LOW);
-
-    hardware_stage = WAITING_CAR_PARKING;
-
-  }
-
-  if(hardware_stage == WAITING_ENTRANCE_SERVER_RESPONSE_WITH_THE_ORDER_OF_SERVICE_ID && strcmp(topic, "Estapar/OrdemDeServicoDeEntradaNaoEncontrada") == 0) {
-
-    // Pulsing three times...
-    for(int i = 0; i < 3; i++) {
+  // Looping three times...
+  for(int i = 0; i < 3; i++) {
 
       // Playing buzzer...
       play_buzzer();
@@ -224,10 +210,121 @@ void on_message(char* topic, byte* message, unsigned int length)
 
     }
 
+}
+
+/*
+ * Instancing a callback to be called when a mqtt message arrives.
+ */
+void on_message(char* topic, byte* message, unsigned int length) 
+{
+
+  // Printing the arrived message topic...
+  Serial.print("\nMessage arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(".");
+
+  // Warning the message print...
+  Serial.print("\nMessage: ");
+
+
+  // Instancing a variable to store the temporary message.
+  String messageTemp;
+  
+  // Constructing the message...
+  for (int i = 0; i < length; i++) {
+    messageTemp += (char)message[i];
+  }
+
+  // Printing the message.
+  Serial.print(messageTemp);
+
+  // Printing a blank line.
+  Serial.println("");
+
+  // If the system find an entry order of service associated to the read rfid...
+  if(hardware_stage == ENTRY__WAITING_SERVER_RESPONSE &&  strcmp(topic, "Estapar/OrdemDeServicoDeEntradaEncontrada") == 0) {
+
+    // Storing the id of the entry order of service.
+    entry_order_of_service_id = messageTemp;
+
+    // Turning on LED 1 as blue.
+    digitalWrite(OUTPUT_LED_1_R, LOW);
+    digitalWrite(OUTPUT_LED_1_G, LOW);
+    digitalWrite(OUTPUT_LED_1_B, HIGH);
+
+    // Turning on LED 2 as yellow.
+    digitalWrite(OUTPUT_LED_2_R, HIGH);
+    digitalWrite(OUTPUT_LED_2_G, HIGH);
+    digitalWrite(OUTPUT_LED_2_B, LOW);
+
+    // Updating the hardware stage to the next step.
+    hardware_stage = ENTRY__WAITING_CAR_PARKING;
+
+  }
+
+  // If the system doesn't find an entry order of service associated to the read rfid...
+  if(hardware_stage == ENTRY__WAITING_SERVER_RESPONSE && strcmp(topic, "Estapar/OrdemDeServicoDeEntradaNaoEncontrada") == 0) {
+
+    // Emitting an error and pulsing three times...
+    emit_error();
+
     // Restarting device.
+    ESP.restart();
+  
+  }
+
+  // If the system find an exit order of service associated to the read rfid...
+  if(hardware_stage == EXIT__WAITING_SERVER_RESPONSE && strcmp(topic, "Estapar/OrdemDeServicoDeSaidaEncontrada") == 0) {
+
+    // Storing the id of the exit order of service.
+    exit_order_of_service_id = messageTemp;
+
+    // Keeping LED 1 as blue.
+    digitalWrite(OUTPUT_LED_1_R, LOW);
+    digitalWrite(OUTPUT_LED_1_G, LOW);
+    digitalWrite(OUTPUT_LED_1_B, HIGH);
+
+    // Setting LED 2 as cian.
+    digitalWrite(OUTPUT_LED_2_R, LOW);
+    digitalWrite(OUTPUT_LED_2_G, HIGH);
+    digitalWrite(OUTPUT_LED_2_B, HIGH);
+
+    // Updating the hardware stage to the next step.
+    hardware_stage = EXIT__WAITING_CAR_DELIVERY;
+
+  }
+
+  // If the system doesn't find an exit order of service associated to the read rfid...
+  if(hardware_stage == EXIT__WAITING_SERVER_RESPONSE && strcmp(topic, "Estapar/OrdemDeServicoDeSaidaNaoEncontrada") == 0) {
+
+    // Emitting an error and pulsing three times...
+    emit_error();
+
+    // Setting the hardware stage as... (backing to the last step).
+    hardware_stage = EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
+
+    // Keeping LED 1 as blue.
+    digitalWrite(OUTPUT_LED_1_R, LOW);
+    digitalWrite(OUTPUT_LED_1_G, LOW);
+    digitalWrite(OUTPUT_LED_1_B, HIGH);
+
+  }
+
+  // If the system receives a message on "Estapar/LiberarDispositivo"...
+  if(hardware_stage == EXIT__CAR_DELIVERED && strcmp(topic, "Estapar/LiberarDispositivo") == 0) {
+
+    // Playing buzzer...
+    play_buzzer();
+
+    // Waiting five secods...
+    delay(5000);
+
+    // Restarting the device.
     ESP.restart();
 
   }
+
+  
   
 }
 
@@ -284,33 +381,24 @@ void stop_buzzer()
 void rfid_captor()
 {
 
-  // Instancing a memory space to store the RFID read.
-	String strID = "";
+  strRFID = "";
 
 	// Generating the number of RFID tag....
 	for (byte i = 0; i < 4; i++)
 	{
-		strID +=
+		strRFID +=
 			(rfid.uid.uidByte[i] < 0x10 ? "0" : "") +
 			String(rfid.uid.uidByte[i], HEX) +
 			(i != 3 ? ":" : "");
 	}
 
   // Transforming the text to uppercase...
-	strID.toUpperCase();
+	strRFID.toUpperCase();
 
   // Printing the RFID read.
 	Serial.print("RFID Tag: ");
-	Serial.println(strID);
+	Serial.println(strRFID);
 
-  char *nStr = const_cast<char*>(strID.c_str());
-
-  if(hardware_stage == WAITING_VALET_LINK_RFID_TO_SET_ORDER_OF_SERVICE) {
-
-    client.publish("Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral", nStr);
-
-  }
-  
 	// Stopping the reading...
 	rfid.PICC_HaltA();
 
@@ -342,8 +430,6 @@ void loop() {
   // Listen MQTT broker.
   client.loop();
 
-  // Caso não haja um cartão RFID próximo, ou se um cartão RFID permanecer próximo ao sensor, ignorando uma nova leitura...
-
   // If has not RFID card nearby, or the RFID stay nearby the sensor, ignoring a new read...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
 	{
@@ -357,22 +443,26 @@ void loop() {
 		// Capturing a new RFID...
 		rfid_captor();
 
-    if(hardware_stage == WAITING_VALET_LINK_RFID_TO_SET_ORDER_OF_SERVICE) {
+    char *nStr = const_cast<char*>(strRFID.c_str());
+
+    if(hardware_stage == ENTRY__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
+
+      client.publish("Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral", nStr);
 
       // Setting the current step as 1.
-      hardware_stage = WAITING_ENTRANCE_SERVER_RESPONSE_WITH_THE_ORDER_OF_SERVICE_ID;
+      hardware_stage = ENTRY__WAITING_SERVER_RESPONSE;
 
-    } else if (hardware_stage == WAITING_CAR_PARKING) {
+    } else if (hardware_stage == ENTRY__WAITING_CAR_PARKING) {
 
       // Keeping LED 1 as blue.
       digitalWrite(OUTPUT_LED_1_R, LOW);
       digitalWrite(OUTPUT_LED_1_G, LOW);
       digitalWrite(OUTPUT_LED_1_B, HIGH);
 
-      // Turning on LED 2 as white.
+      // Turning on LED 2 as yellow.
       digitalWrite(OUTPUT_LED_2_R, HIGH);
       digitalWrite(OUTPUT_LED_2_G, HIGH);
-      digitalWrite(OUTPUT_LED_2_B, HIGH);
+      digitalWrite(OUTPUT_LED_2_B, LOW);
 
       // Converting the string to a array of chars...
       char *orderOfServiceIdStr = const_cast<char*>(entry_order_of_service_id.c_str());
@@ -380,8 +470,53 @@ void loop() {
       // Publishing that car is parked...
       client.publish("Estapar/CarroEstacionado", orderOfServiceIdStr);
 
-      hardware_stage = CAR_PARKED;
+      // Setting the hardware stage as car parked.
+      hardware_stage = ENTRY__CAR_PARKED;
 
+      // Setting LED 2 as magenta.
+      digitalWrite(OUTPUT_LED_2_R, HIGH);
+      digitalWrite(OUTPUT_LED_2_G, LOW);
+      digitalWrite(OUTPUT_LED_2_B, HIGH);
+
+      // Subscribing to exit related mqtt topics...
+      client.subscribe("Estapar/OrdemDeServicoDeSaidaEncontrada");
+      client.subscribe("Estapar/OrdemDeServicoDeSaidaNaoEncontrada");
+
+      hardware_stage = EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
+
+    } else if (hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
+
+      // Keeping LED 1 as blue.
+      digitalWrite(OUTPUT_LED_1_R, LOW);
+      digitalWrite(OUTPUT_LED_1_G, LOW);
+      digitalWrite(OUTPUT_LED_1_B, HIGH);
+
+      client.publish("Estapar/VincularOrdemDeServicoDeSaidaComBlocoCentral", nStr);
+
+      hardware_stage = EXIT__WAITING_SERVER_RESPONSE;
+
+    } else if (hardware_stage == EXIT__WAITING_CAR_DELIVERY) {
+
+      // Keeping LED 1 as blue.
+      digitalWrite(OUTPUT_LED_1_R, LOW);
+      digitalWrite(OUTPUT_LED_1_G, LOW);
+      digitalWrite(OUTPUT_LED_1_B, HIGH);
+
+      // Setting LED 2 as white.
+      digitalWrite(OUTPUT_LED_2_R, HIGH);
+      digitalWrite(OUTPUT_LED_2_G, HIGH);
+      digitalWrite(OUTPUT_LED_2_B, HIGH);
+
+      hardware_stage = EXIT__CAR_DELIVERED;
+
+      // Subscribing to the...
+      client.subscribe("Estapar/LiberarDispositivo");
+
+      // Converting the string to a array of chars...
+      char *orderOfServiceIdStr = const_cast<char*>(exit_order_of_service_id.c_str());
+
+      // Publishing car delivered.
+      client.publish("Estapar/CarroEntregue", orderOfServiceIdStr);
 
     }
     
