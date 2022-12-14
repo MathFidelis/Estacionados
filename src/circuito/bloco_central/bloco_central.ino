@@ -41,6 +41,10 @@ MFRC522 rfid = MFRC522(RFID_SS_SDA, RFID_RST);
 const char* WIFI_SSID = "iPhone";
 const char* WIFI_PASSWORD = "12345678";
 
+// Instancing the access point WiFi credentials.
+const char * AP_FTM_SSID = "HelloWorld";
+const char * AP_FTM_PASS = "HelloWorld";
+
 // Instancing the primary MQTT credentials.
 const char *BROKER_MQTT_HOST = "broker.hivemq.com";
 const char *BROKER_MQTT_CLIENT_ID = "7b6e3af9-fee4-4e9e-94ac-662e9020a17d";
@@ -61,6 +65,88 @@ String exit_order_of_service_id = "";
 
 // Instancing a memory space to store the RFID read.
 String strRFID = "";
+
+// -------------------------- Warning --------------------------
+//
+// Initial configurations for distance measurement - <<<FTM>>>.
+//
+// -------------------------------------------------------------
+
+// Setting up the periods.
+const uint8_t FTM_FRAME_COUNT = 16;
+const uint16_t FTM_BURST_PERIOD = 2;
+
+// Instancing a semaphore to signal when a FTM report is received.
+xSemaphoreHandle sinalizadorFTM;
+
+// Instancing a variable to store the status of the FTM report to be received.
+bool status_do_relatorio_FTM = true;
+
+// Instancing a variable to store the calculated distance.
+float distancia_do_roteador_em_metros = 0.0;
+
+/*
+ * Measure the estimated distance when a ftm report is received.
+ */
+void ao_receber_um_relatorio_FTM(arduino_event_t *event) {
+
+	// Instancing the possible response status.
+  const char * status_str[5] = {"SUCCESS", "UNSUPPORTED", "CONF_REJECTED", "NO_RESPONSE", "FAIL"};
+
+	// Instancing a pointer to the report.
+  wifi_event_ftm_report_t * report = &event -> event_info.wifi_ftm_report;
+
+  // Definindo o status global do relatório.
+  status_do_relatorio_FTM = report -> status == FTM_STATUS_SUCCESS;
+
+	// Controlling the flow through the current status of the report.
+  if (status_do_relatorio_FTM) {
+
+		// Storing the calculated distance.
+    distancia_do_roteador_em_metros = (report -> dist_est / 100.0) - 40.0;
+
+		// Freeing the memory after the use of the variables.
+    free(report->ftm_report_data);
+
+  } else {
+
+		// Printing the error.
+    Serial.println("FTM report denied: ");
+    Serial.println(status_str[report->status]);
+
+  }
+
+	// Informing that a semaphore was received.
+  xSemaphoreGive(sinalizadorFTM);
+
+}
+
+/*
+ * Initializing a FTM session and requesting a FTM report.
+ */
+bool solicitar_um_relatorio_FTM(){
+
+	// Controlling possible errors.
+  if(!WiFi.initiateFTM(FTM_FRAME_COUNT, FTM_BURST_PERIOD)){
+
+		// Informing the failure to start the session.
+		Serial.println("FTM Error: Failed to start session.");
+
+    // Returning a false response.
+    return false;
+
+  }
+
+	// Awaiting the signal that the report was received successfully and returning true.
+  return xSemaphoreTake(sinalizadorFTM, portMAX_DELAY) == pdPASS && status_do_relatorio_FTM;
+
+}
+
+// -------------------------- Warning --------------------------
+//
+// Ending configurations for distance measurement - <<<FTM>>>.
+//
+// -------------------------------------------------------------
 
 /*
  * Settuping the circuit.
@@ -174,6 +260,42 @@ void setup_rfid()
 
 	// Initializing the MFRC522.
 	rfid.PCD_Init();
+
+}
+
+/*
+ * Setupping acess point.
+ */
+void setup_ap() {
+
+  // Waiting 10 miliseconds to avoid bugs...
+  delay(10);
+
+  // Printing the current system status...
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.print(AP_FTM_SSID);
+
+  // Connecting to the access point WiFi network...
+  WiFi.begin(AP_FTM_SSID, AP_FTM_PASS);
+
+  // Printing the current system status...
+  while (WiFi.status() != WL_CONNECTED) {
+
+    delay(500);
+    Serial.print(".");
+
+  }
+
+  // Printing the current system status...
+  Serial.println("");
+  Serial.println("AP connected");
+  Serial.print("IP address: ");
+  Serial.print(WiFi.localIP());
+  Serial.println("");
+
+  // Printing a blank line.
+  Serial.println("");
 
 }
 
@@ -353,6 +475,22 @@ void reconnect()
 
       // Printing a blank line.
       Serial.println("");
+
+      if(hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE && distancia_do_roteador_em_metros) {
+
+        // Converting the distance to string.
+        String distance_in_meters_str = String(distancia_do_roteador_em_metros);
+
+        // Converting the string to a array of chars...
+        char *distance_in_meters_str_c = const_cast<char*>(distance_in_meters_str.c_str());
+
+        // Publishing that car distance...
+        client.publish("Estapar/CarroEstacionado/distancia", distance_in_meters_str_c);
+
+        // Printing the system current status.
+        Serial.println("Measured distance transmitted successfully!\n");
+
+      }
       
     } else {
 
@@ -493,6 +631,51 @@ void loop() {
 
 			// Setting the hardware stage as car parked.
 			hardware_stage = ENTRY__CAR_PARKED;
+
+			// -------------------------- Warning --------------------------
+			//
+			// Initial configurations for distance measurement - <<<FTM>>>.
+			//
+			// -------------------------------------------------------------
+
+			// Disconnecting from the current connected WiFi network.
+			WiFi.disconnect();
+
+			// Delaying 200ms.
+			delay(200);
+
+			// Setupping the WiFi in AP mode.
+			setup_ap();
+
+			// Creating a binary semaphore to control the FTM report.
+			sinalizadorFTM = xSemaphoreCreateBinary();
+
+			// Listening FTM reports events.
+			WiFi.onEvent(ao_receber_um_relatorio_FTM, ARDUINO_EVENT_WIFI_FTM_REPORT);
+
+			// Printing the current status of the system.
+			Serial.println("Initializing FTM session...");
+
+			// Requesting a FTM report.
+			solicitar_um_relatorio_FTM();
+
+			// Printing the current status of the system.
+  		Serial.printf("Car distance from access point: %.2f m\n", (float) distancia_do_roteador_em_metros);
+
+			// Disconnecting from the WiFi AP network.
+			WiFi.disconnect();
+
+			// Connecting to the WiFi primary network.
+			setup_wifi();
+
+			// -------------------------- Warning --------------------------
+			//
+			// Ending configurations for distance measurement - <<<FTM>>>.
+			//
+			// -------------------------------------------------------------
+
+			// Delaying 200ms.
+			delay(200);
 
 			// Setting LED 2 as magenta.
 			digitalWrite(OUTPUT_LED_2_R, HIGH);
