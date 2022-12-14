@@ -95,19 +95,21 @@ void setup() {
  */
 void setup_leds() {
 
-  pinMode(OUTPUT_LED_1_R, OUTPUT);
-  pinMode(OUTPUT_LED_1_G, OUTPUT);
-  pinMode(OUTPUT_LED_1_B, OUTPUT);
-  pinMode(OUTPUT_LED_2_R, OUTPUT);
-  pinMode(OUTPUT_LED_2_G, OUTPUT);
-  pinMode(OUTPUT_LED_2_B, OUTPUT);
+	// Setting the pin mode of leds as output.
+	pinMode(OUTPUT_LED_1_R, OUTPUT);
+	pinMode(OUTPUT_LED_1_G, OUTPUT);
+	pinMode(OUTPUT_LED_1_B, OUTPUT);
+	pinMode(OUTPUT_LED_2_R, OUTPUT);
+	pinMode(OUTPUT_LED_2_G, OUTPUT);
+	pinMode(OUTPUT_LED_2_B, OUTPUT);
 
-  digitalWrite(OUTPUT_LED_1_R, LOW);
-  digitalWrite(OUTPUT_LED_1_G, HIGH);
-  digitalWrite(OUTPUT_LED_1_B, LOW);
-  digitalWrite(OUTPUT_LED_2_R, LOW);
-  digitalWrite(OUTPUT_LED_2_G, LOW);
-  digitalWrite(OUTPUT_LED_2_B, LOW);
+	// Turning on the leds.
+	digitalWrite(OUTPUT_LED_1_R, LOW);
+	digitalWrite(OUTPUT_LED_1_G, HIGH);
+	digitalWrite(OUTPUT_LED_1_B, LOW);
+	digitalWrite(OUTPUT_LED_2_R, LOW);
+	digitalWrite(OUTPUT_LED_2_G, LOW);
+	digitalWrite(OUTPUT_LED_2_B, LOW);
 
 }
 
@@ -141,8 +143,6 @@ void setup_wifi() {
   Serial.print("IP address: ");
   Serial.print(WiFi.localIP());
   Serial.println("");
-
-  WiFi.SSID();
 
   // Printing a blank line.
   Serial.println("");
@@ -328,6 +328,10 @@ void on_message(char* topic, byte* message, unsigned int length)
   
 }
 
+
+/*
+ * Instancing a function to be called when mqtt client is disconnected.
+ */
 void reconnect() 
 {
 
@@ -352,6 +356,7 @@ void reconnect()
       
     } else {
 
+	  	// Printing the current system status.
       Serial.println("Trying again in 5 seconds...");
 
       // Wait 5 seconds before retrying
@@ -362,26 +367,36 @@ void reconnect()
 
 }
 
+/*
+ * Instancing a function to play a song on buzzer.
+ */
 void play_buzzer()
 {
 
-  // Playing a song of 300Hz...
+	// Playing a song of 300Hz...
 	tone(OUTPUT_BUZZER, 3000);
 
 }
 
+/*
+ * Instancing a function to stop the song on buzzer.
+ */
 void stop_buzzer()
 {
 
-  // Interrupting the song...
+	// Interrupting the song...
 	noTone(OUTPUT_BUZZER);
 
 }
 
+/*
+ * Instancing a function to capture the RFID tag.
+ */
 void rfid_captor()
 {
 
-  strRFID = "";
+	// Cleaning up the RFID tag...
+	strRFID = "";
 
 	// Generating the number of RFID tag....
 	for (byte i = 0; i < 4; i++)
@@ -416,109 +431,119 @@ void rfid_captor()
 
 }
 
-
+/*
+ * Instancing the loop function.
+ */
 void loop() {
 
-  // If client is not connected.
-  if (!client.connected()) {
+	// If client is not connected.
+	if (!client.connected()) {
 
-    // Reconnecting...
-    reconnect();
+		// Reconnecting...
+		reconnect();
 
-  }
+	}
 
-  // Listen MQTT broker.
-  client.loop();
+	// Listen MQTT broker.
+	client.loop();
 
-  // If has not RFID card nearby, or the RFID stay nearby the sensor, ignoring a new read...
+	// If has not RFID card nearby, or the RFID stay nearby the sensor, ignoring a new read...
 	if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
 	{
 
 		return;
     
 	}
-	else
+	else 
 	{
 
+		// If a new card is detected...
 		// Capturing a new RFID...
 		rfid_captor();
 
-    char *nStr = const_cast<char*>(strRFID.c_str());
+		// Transforming the string to char array.
+		char *nStr = const_cast<char*>(strRFID.c_str());
 
-    if(hardware_stage == ENTRY__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
+		// If the hardware stage is waiting for a valet link the RFID to search the order of service...
+		if(hardware_stage == ENTRY__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
 
-      client.publish("Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral", nStr);
+			// Publishing the RFID to search the order of service.
+			client.publish("Estapar/VincularOrdemDeServicoDeEntradaComBlocoCentral", nStr);
 
-      // Setting the current step as 1.
-      hardware_stage = ENTRY__WAITING_SERVER_RESPONSE;
+			// Setting the current step as 1.
+			hardware_stage = ENTRY__WAITING_SERVER_RESPONSE;
 
-    } else if (hardware_stage == ENTRY__WAITING_CAR_PARKING) {
+		} else if (hardware_stage == ENTRY__WAITING_CAR_PARKING) {
 
-      // Keeping LED 1 as blue.
-      digitalWrite(OUTPUT_LED_1_R, LOW);
-      digitalWrite(OUTPUT_LED_1_G, LOW);
-      digitalWrite(OUTPUT_LED_1_B, HIGH);
+			// Keeping LED 1 as blue.
+			digitalWrite(OUTPUT_LED_1_R, LOW);
+			digitalWrite(OUTPUT_LED_1_G, LOW);
+			digitalWrite(OUTPUT_LED_1_B, HIGH);
 
-      // Turning on LED 2 as yellow.
-      digitalWrite(OUTPUT_LED_2_R, HIGH);
-      digitalWrite(OUTPUT_LED_2_G, HIGH);
-      digitalWrite(OUTPUT_LED_2_B, LOW);
+			// Turning on LED 2 as yellow.
+			digitalWrite(OUTPUT_LED_2_R, HIGH);
+			digitalWrite(OUTPUT_LED_2_G, HIGH);
+			digitalWrite(OUTPUT_LED_2_B, LOW);
 
-      // Converting the string to a array of chars...
-      char *orderOfServiceIdStr = const_cast<char*>(entry_order_of_service_id.c_str());
+			// Converting the string to a array of chars...
+			char *orderOfServiceIdStr = const_cast<char*>(entry_order_of_service_id.c_str());
 
-      // Publishing that car is parked...
-      client.publish("Estapar/CarroEstacionado", orderOfServiceIdStr);
+			// Publishing that car is parked...
+			client.publish("Estapar/CarroEstacionado", orderOfServiceIdStr);
 
-      // Setting the hardware stage as car parked.
-      hardware_stage = ENTRY__CAR_PARKED;
+			// Setting the hardware stage as car parked.
+			hardware_stage = ENTRY__CAR_PARKED;
 
-      // Setting LED 2 as magenta.
-      digitalWrite(OUTPUT_LED_2_R, HIGH);
-      digitalWrite(OUTPUT_LED_2_G, LOW);
-      digitalWrite(OUTPUT_LED_2_B, HIGH);
+			// Setting LED 2 as magenta.
+			digitalWrite(OUTPUT_LED_2_R, HIGH);
+			digitalWrite(OUTPUT_LED_2_G, LOW);
+			digitalWrite(OUTPUT_LED_2_B, HIGH);
 
-      // Subscribing to exit related mqtt topics...
-      client.subscribe("Estapar/OrdemDeServicoDeSaidaEncontrada");
-      client.subscribe("Estapar/OrdemDeServicoDeSaidaNaoEncontrada");
+			// Subscribing to exit related mqtt topics...
+			client.subscribe("Estapar/OrdemDeServicoDeSaidaEncontrada");
+			client.subscribe("Estapar/OrdemDeServicoDeSaidaNaoEncontrada");
 
-      hardware_stage = EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
+			// Updating the hardware stage.
+			hardware_stage = EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
 
-    } else if (hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
+		} else if (hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
 
-      // Keeping LED 1 as blue.
-      digitalWrite(OUTPUT_LED_1_R, LOW);
-      digitalWrite(OUTPUT_LED_1_G, LOW);
-      digitalWrite(OUTPUT_LED_1_B, HIGH);
+			// Keeping LED 1 as blue.
+			digitalWrite(OUTPUT_LED_1_R, LOW);
+			digitalWrite(OUTPUT_LED_1_G, LOW);
+			digitalWrite(OUTPUT_LED_1_B, HIGH);
 
-      client.publish("Estapar/VincularOrdemDeServicoDeSaidaComBlocoCentral", nStr);
+			// Publishing the RFID to search the order of service.
+			client.publish("Estapar/VincularOrdemDeServicoDeSaidaComBlocoCentral", nStr);
 
-      hardware_stage = EXIT__WAITING_SERVER_RESPONSE;
+			// Updating the hardware stage.
+			hardware_stage = EXIT__WAITING_SERVER_RESPONSE;
 
-    } else if (hardware_stage == EXIT__WAITING_CAR_DELIVERY) {
+		} else if (hardware_stage == EXIT__WAITING_CAR_DELIVERY) {
 
-      // Keeping LED 1 as blue.
-      digitalWrite(OUTPUT_LED_1_R, LOW);
-      digitalWrite(OUTPUT_LED_1_G, LOW);
-      digitalWrite(OUTPUT_LED_1_B, HIGH);
+			// Keeping LED 1 as blue.
+			digitalWrite(OUTPUT_LED_1_R, LOW);
+			digitalWrite(OUTPUT_LED_1_G, LOW);
+			digitalWrite(OUTPUT_LED_1_B, HIGH);
 
-      // Setting LED 2 as white.
-      digitalWrite(OUTPUT_LED_2_R, HIGH);
-      digitalWrite(OUTPUT_LED_2_G, HIGH);
-      digitalWrite(OUTPUT_LED_2_B, HIGH);
+			// Setting LED 2 as white.
+			digitalWrite(OUTPUT_LED_2_R, HIGH);
+			digitalWrite(OUTPUT_LED_2_G, HIGH);
+			digitalWrite(OUTPUT_LED_2_B, HIGH);
 
-      hardware_stage = EXIT__CAR_DELIVERED;
+			// Updating the hardware stage.
+			hardware_stage = EXIT__CAR_DELIVERED;
 
-      // Subscribing to the...
-      client.subscribe("Estapar/LiberarDispositivo");
+			// Subscribing to the...
+			client.subscribe("Estapar/LiberarDispositivo");
 
-      // Converting the string to a array of chars...
-      char *orderOfServiceIdStr = const_cast<char*>(exit_order_of_service_id.c_str());
+			// Converting the string to a array of chars...
+			char *orderOfServiceIdStr = const_cast<char*>(exit_order_of_service_id.c_str());
 
-      // Publishing car delivered.
-      client.publish("Estapar/CarroEntregue", orderOfServiceIdStr);
+			// Publishing car delivered.
+			client.publish("Estapar/CarroEntregue", orderOfServiceIdStr);
 
-    }
+		}
     
 
   }
