@@ -94,13 +94,14 @@ void setup_wifi() {
   Serial.print(WiFi.localIP());
   Serial.println("");
 
-  WiFi.SSID();
-
   // Printing a blank line.
   Serial.println("");
 
 }
 
+/*
+ * Setupping MQTT.
+ */
 void setup_mqtt() 
 {
 
@@ -109,6 +110,9 @@ void setup_mqtt()
 
 }
 
+/*
+ * Setupping RFID.
+ */
 void setup_rfid() 
 {
 
@@ -120,6 +124,9 @@ void setup_rfid()
 
 }
 
+/*
+ * Instancing a function to be called when connection is lost.
+ */
 void reconnect() 
 {
 
@@ -140,6 +147,7 @@ void reconnect()
       
     } else {
 
+			// Printing the current system status.
       Serial.println("Trying again in 5 seconds...");
 
       // Wait 5 seconds before retrying
@@ -151,6 +159,9 @@ void reconnect()
 
 }
 
+/*
+ * Instancing a function to play a song.
+ */
 void play_buzzer()
 {
 
@@ -159,6 +170,9 @@ void play_buzzer()
 
 }
 
+/*
+ * Instancing a function to stop the song.
+ */
 void stop_buzzer()
 {
 
@@ -167,9 +181,13 @@ void stop_buzzer()
 
 }
 
+/*
+ * Instancing a function to read the RFID.
+ */
 void rfid_captor()
 {
 
+	// Cleaning up the RFID string...
   strRFID = "";
 
 	// Generating the number of RFID tag....
@@ -205,7 +223,9 @@ void rfid_captor()
 
 }
 
-
+/*
+ * Instancing the loop function.
+ */
 void loop() {
 
   // If client is not connected.
