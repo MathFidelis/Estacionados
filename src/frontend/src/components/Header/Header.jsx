@@ -106,6 +106,7 @@ function Header(props) {
     // }, [])
 
     const UserRole = () => {
+        console.log(userData);
         if (userData.role == "manager") {
             return <>Administrador da Unidade</>
         } 
