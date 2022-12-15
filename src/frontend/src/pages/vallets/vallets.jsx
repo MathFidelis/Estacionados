@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../../components/header/Header';
 import styled from 'styled-components';
 import character from '../../assets/images/character.png';
 import eye from '../../assets/images/eye.svg';
