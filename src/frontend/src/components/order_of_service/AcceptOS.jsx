@@ -128,12 +128,19 @@ function AcceptOS(props) {
             setValletsList(data.success.data);
         })
 
+        fetch(`http://api.estapar.code.br.com:1337/api/v1/order-of-service/${props.id}`, requestSettings).then((response) => {
+            return response.json();
+        }).then((data) => {
+            setCurrentOS(data.success.data);
+        })
+
+
     }, [])
 
+    const [ currentOS, setCurrentOS ] = useState([]);
     const [ valletsList, setValletsList ] = useState([]);
     const [ valletEmail, setValletEmail ] = useState('');
     const [ valletPassword, setValletPassword ] = useState('');
-    console.log(valletsList)
     const handleValletEmail = (e) => {
         setValletEmail(e.target.value);
     }
@@ -211,15 +218,15 @@ function AcceptOS(props) {
             <OSDescription>
                 <Row>
                     <Attribute>Tipo</Attribute>
-                    <Value>Entrada</Value>
+                    <Value>{currentOS.type}</Value>
                 </Row>
                 <Row>
                     <Attribute>Placa do Veículo</Attribute>
-                    <Value>AAA-A2AA</Value>
+                    <Value>{currentOS.vehicle_plate}</Value>
                 </Row>
                 <Row>
                     <Attribute>Cor</Attribute>
-                    <Value>Branco</Value>
+                    <Value>{currentOS.vehicle_color}</Value>
                 </Row>
             </OSDescription>
             <Form>
