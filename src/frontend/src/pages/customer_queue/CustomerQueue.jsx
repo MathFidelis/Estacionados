@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import eye from '../../assets/images/queue-eye.svg';
 import './Queue.css';
@@ -84,6 +84,34 @@ function CustomerQueue() {
 
     )
   } 
+
+  const [ fullQueue, setFullQueue ] = useState([]);
+
+  useEffect(()=>{
+
+    const requestSettings = {
+        method: 'GET',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+
+    fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=pending,accepted,finished', requestSettings)
+    .then(response => {
+        return response.json()
+    })
+    .catch(error => {
+
+        console.log(error);
+
+    })
+    .then(data => console.log(data))
+    .catch(error => {
+        console.error("Error fetching data: ", error)
+    })
+
+  })
 
   return (
     <>

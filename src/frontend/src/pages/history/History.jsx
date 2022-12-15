@@ -188,7 +188,7 @@ function History() {
         }
     }
 
-    fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=accepted', requestSettings)
+    fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=finished', requestSettings)
     .then(response => {
         return response.json()
     })
@@ -210,8 +210,6 @@ function History() {
 
     const getHourMinute = (time) => {
         let date = new Date(time);
-        console.log(time);
-        console.log(date);
         return (`${date.getHours()}:${date.getMinutes()}`)
     }
 
@@ -239,6 +237,7 @@ function History() {
                     <TBody>
                         {
                             historyList.map((item,index) => {
+                                console.log(item);
                                 return <TrConstructor clasName="history-line"
                                     key={index} 
                                     name={`${item.user.first_name} ${item.user.last_name}`}
@@ -254,7 +253,7 @@ function History() {
                 </Table>
                 </Column>
                 <PagesDiv className='pages-div'>
-                    <PageButton onClick={()=> {console.log('a')}}>1</PageButton>
+                    <PageButton>1</PageButton>
                     ...
                     <PageButton>3</PageButton>
                     <PageButton className='active'>4</PageButton>

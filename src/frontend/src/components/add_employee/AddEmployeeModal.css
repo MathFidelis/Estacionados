@@ -29,3 +29,7 @@ select {
     color: #CECECE;
     font-weight: 600;
 }
+
+.password, .password::placeholder {
+    letter-spacing: 1px;
+}

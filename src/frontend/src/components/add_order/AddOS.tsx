@@ -96,6 +96,7 @@ function AddOS(props) {
         
         
             let token = sessionStorage.getItem('token');
+            console.log(token);
             const requestSettings = {
                 method: 'POST',
                 headers: { 

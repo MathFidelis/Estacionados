@@ -37,7 +37,7 @@ padding-top: 4rem;
 
 function ValletQueue() {
 
-    const handleAcceptOS = (e) => {
+    const handleSelectedOS = (e) => {
         setSelectedOS(e.target.id);
         handleModalVisible();
     }
@@ -68,7 +68,7 @@ function ValletQueue() {
 
         return (
         
-        <Plate type="button" id={props.id}  onClick={handleAcceptOS}>
+        <Plate type="button" id={props.id}  onClick={handleSelectedOS}>
             {props.plate}
             <Time>há {props.time} minutos</Time>
         </Plate>

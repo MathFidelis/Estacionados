@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import ModalStructure from '../modal_structure/Modal';
-import './AddEmployeeModal.css';
+import React, { useState } from "react";
+import { useEffect } from "react";
+import styled from "styled-components";
+import ModalStructure from "../modal_structure/Modal";
+import "./AddEmployeeModal.css";
 
 const Inputs = styled.div`
 display: flex;
 width: 100%;
-height: 60%;
+height: 100%;
 padding-top: 1rem; 
 flex-direction: column;
 `
@@ -39,6 +40,12 @@ border-radius: 10px;
 
 const Row = styled.div`
 display:flex;
+width: 100%;
+`
+
+const LinkRFIDRow = styled(Row)`
+justify-content: flex-end;
+align-items: center;
 `
 
 const Title = styled.p`
@@ -77,10 +84,15 @@ background-color: #fff;
 border-radius: 16px;
 `
 
-const AddEmployee = styled(CloseButton)`
+const Button = styled(CloseButton)`
 width: 18rem;
 background-color: #70D44B; 
 `
+
+const LinkRFID = styled(Button)`
+width: 100%;
+`
+
 
 const Select = styled.select`
 padding: 10px;
@@ -99,99 +111,221 @@ const Bold = styled.b`
 margin-right: 0.4rem;
 `
 
+const Bottom = styled.div`       
+display: flex;
+height: 100%;
+align-items: flex-end;
+justify-content: space-between;
+`
 
+const DynamicInputs = styled.div`
+display: flex;
+width: 100%;
+height: 100%;
+flex-direction: column;
+`
+
+function UserInputs(props) {
+    
+    if (props.role == 'valet') {
+        
+        return (
+            <DynamicInputs>
+                <Label htmlFor="name">Nome</Label>
+                <ModalInput onChange={props.handleEmployeeName} className="modal-input" placeholder="José da Silva" />
+                <Label htmlFor="cpf">CPF</Label>
+                <ModalInput type={"text"} onChange={props.handleEmployeeCpf} className="modal-input" name="cpf" placeholder="000.000.000-00" />
+                <Row style={{justifyContent: 'space-between'}}>
+                    <Label htmlFor="driver-license-type">Tipo de CNH</Label>
+                    <Row style={{width: '50%', justifyContent: 'flex-start'}}>
+                        <Label>E-mail</Label>
+                    </Row>
+                </Row>
+                <Row style={{justifyContent: 'space-between'}}>
+                    <Select style={{width: '15rem'}} onChange={props.handleLicenseType}>
+                        <Option value={"A"}>A</Option>
+                        <Option value={"B"}>B</Option>
+                        <Option value={"AB"}>AB</Option>
+                    </Select>
+                        <ModalInput style={{width: '50%'}} placeholder="manobrista@estapar.com" onChange={props.handleEmployeeEmail} />
+                </Row>
+                <Row style={{justifyContent: 'space-between'}}>
+                    <Label htmlFor="employee-type">Tipo do manobrista</Label>
+                    <Row style={{width: '50%', justifyContent: 'flex-start'}}>
+                        <Label>Senha</Label>
+                    </Row>
+                </Row>
+                <Row style={{justifyContent: 'space-between'}}>
+                    <Select style={{width: '15rem'}} id="employee-type" onChange={props.handleEmployeeType}>
+                        <Option>Temporário</Option>
+                        <Option>Efetivado</Option>
+                    </Select>
+                    <ModalInput style={{width: '50%'}} placeholder="********" onChange={props.handleEmployeePassword} />
+                </Row>
+                <Label htmlFor="name">Tag RFID</Label>
+                <ModalInput readOnly='readonly' id="RFID-Input" onChange={props.handleRFIDTag}  className="modal-input" />
+            </DynamicInputs>
+        )
+        
+    }    
+    else {
+        return (
+            <DynamicInputs>
+                <Label htmlFor="name">Nome</Label>
+                <ModalInput onChange={props.handleEmployeeName} className="modal-input" placeholder="José da Silva" />
+                <Label htmlFor="email">E-mail</Label>
+                <ModalInput type={"email"} placeholder="administrador@estapar.com" />
+                <Label htmlFor="password">Senha</Label>
+                <ModalInput className="password" type={"password"} placeholder="********" />
+                <Label htmlFor="cpf">CPF</Label>
+                <ModalInput type={"text"} onChange={props.handleEmployeeCpf} className="modal-input" name="cpf" placeholder="000.000.000-00" />
+            </DynamicInputs>
+        )
+    }    
+
+}
 
 function AddEmployeeModal(props) {
 
-    const addEmployee = async () => {
+    const roleOptions = [
+        {
+            name: "Gerente",
+            value: "manager"
+        },
+        {
+            name: "Manobrista",
+            value: "valet"
+        }
+    ]
+ 
+    const [ employeeRole, setEmployeeRole ] = useState(roleOptions[0].value);
+    const [ employeeName, setEmployeeName ] = useState('');
+    const [ employeeCpf, setEmployeeCpf ] = useState('');
+    const [ RFIDTag, setRFIDTag ] = useState('');
+    const [ licenseType, setLicenseType ] = useState('');
+    const [ employeeType, setEmployeeType ] = useState(false);
+    const [ employeeEmail, setEmployeeEmail ] = useState('');
+    const [ employeePassword, setEmployeePassword ] = useState('');
 
-        let names = user_name.split(' ');
-        const requestSettings = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+    const addEmployee = () => {
+        let employeeData = {};
+        let names = employeeName.split(' ');
+        if (employeeRole == 'valet') {
+
+            employeeData = {
+                email: employeeEmail,
+                password: employeePassword,
+                role: employeeRole,
                 first_name: names[0],
                 last_name: names[(names.length)-1],
-                cpf: cpf,
-                identity_number: identityNumber,
-
-            })
-        }
-        console.log(
-            `
-            primeiro nome: ${names[0]}
-            último nome: ${names[names.length-1]}
-            cpf: ${cpf}
-            RG: ${identityNumber}
-            nascimento: ${birthDate}
-            carteira: ${driverLicenseType}
-            temporário: ${isTemporary}
-            `
-        )
-    
-    }
-
-    const [ user_name, setName ] = useState('');
-    const [ cpf, setCpf ] = useState('');
-    const [ identityNumber, setIdentityNumber ] = useState('');
-    const [ birthDate, setBirthDate ] = useState('');
-    const [ driverLicenseType, setDriverLicenseType ] = useState('');
-    const [ isTemporary, setIsTemporary ] = useState(false);
-    const handleName = (e) => {
-        setName(e.target.value);
-    }
-    const handleCpf = (e) => {
-        setCpf(e.target.value);
-    }
-    const handleIdentityNumber = (e) => {
-        setIdentityNumber(e.target.value);
-    }
-    const handleBirthDate = (e) => {
-        setBirthDate(e.target.value);
-    }
-    const handleDriverLicenseType = (e) => {
-        setDriverLicenseType(e.target.value);
-    }
-    const handleIsTemporary = (e) => {
-        if (e.target.value == 'Temporário') {
-            setIsTemporary(true)
+                cpf: employeeCpf,
+                type_of_driver_license: licenseType,
+                is_temporary_employee: employeeType
+            }
+            
         }
         else {
-            setIsTemporary(false)
+            
+            employeeData = {
+                email: employeeEmail,
+                password: employeePassword,
+                role: employeeRole,
+                first_name: names[0],
+                last_name: names[(names.length)-1],
+                cpf: employeeCpf,
+            }
+            
+        }
+
+        let token = sessionStorage.getItem('token');
+        const requestSettings = {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(employeeData)
+        }
+    
+        fetch('http://api.estapar.code.br.com:1337/api/v1/user', requestSettings)
+        .then(response => {
+            return response.json()
+        })
+        .catch(error => {
+    
+            console.log(error);
+    
+        })
+        .then(data => console.log(data))
+        .catch(error => {
+            console.error("Error fetching data: ", error)
+        })
+    
+    }
+
+    const handleEmployeeName = (e) => {
+        setEmployeeName(e.target.value);
+    }
+    const handleEmployeeRole = (e) => {
+        setEmployeeRole(e.target.value);
+    }
+    const handleEmployeeEmail = (e) => {
+        setEmployeeEmail(e.target.value);
+    }
+    const handleEmployeePassword = (e) => {
+        setEmployeePassword(e.target.value);
+    }
+    const handleEmployeeCpf = (e) => {
+        setEmployeeCpf(e.target.value);
+    }
+    const handleRFIDTag = (e) => {
+        setRFIDTag(e.target.value);
+    }
+    const handleLicenseType = (e) => {
+        setLicenseType(e.target.value);
+    }
+    const handleEmployeeType = (e) => {
+        if (employeeType == false) {
+            setEmployeeType(true);
+        }
+        else {
+            setEmployeeType(false)
         }
     }
-    
 
     return (
-        <ModalStructure handleModalVisible={props.handleModalVisible}>
+        <ModalStructure>
             <Title>Adicionar novo</Title>
             <Subtitle><Bold>Crie</Bold>manobristas na plataforma e otimize a tomada <br />de ordens de serviço</Subtitle>
             <Inputs>
-                <Label htmlFor='name'>Nome</Label>
-                <ModalInput value={user_name} onChange={handleName} className='modal-input' placeholder='José da Silva' />
-                <Label htmlFor='cpf'>CPF</Label>
-                <ModalInput onChange={handleCpf} type={'text'} className='modal-input' name='cpf' placeholder='000.000.000-00' />
-                <Label htmlFor='identity-number'>Identidade</Label>
-                <ModalInput onChange={handleIdentityNumber} type={'text'} className='modal-input' name='identity-number' placeholder='000.000-00' />
-                <Label htmlFor='birth-date'>Data de nascimento</Label>
-                <ModalInput onChange={handleBirthDate} type={'text'} className='modal-input' name='birth-date' placeholder='DD/MM/YYYY' />
-                <Label htmlFor='driver-license-type'>Tipo de carteira de habilitação</Label>
-                <Select onChange={handleDriverLicenseType}>
-                    <Option value={'A'}>A</Option>
-                    <Option value={'B'}>B</Option>
-                    <Option value={'AB'}>AB</Option>
+            <Label htmlFor="employee-role">Função</Label>
+                <Select name="employee-role" id="employee-role" onChange={handleEmployeeRole}>
+                    {roleOptions.map((item, index) => {
+                        return (
+                            <Option
+                            key={index}
+                            value={item.value}>
+                                {item.name}
+                            </Option>
+                        )
+                    })}
                 </Select>
-                <Label htmlFor='isTemporary'>Tipo do manobrista</Label>
-                <Select onChange={handleIsTemporary}>
-                    <Option value={'Temporário'}>Temporário</Option>
-                    <Option>Efetivado</Option>
-                </Select>
-                <Row style={{justifyContent:'space-between', paddingTop:'1.3rem'}}>
-                    <CloseButton onClick={props.handleModalVisible}>Fechar</CloseButton>
-                    <AddEmployee onClick={addEmployee}>Adicionar manobrista</AddEmployee>
-                </Row>
+                <UserInputs 
+                handleEmployeeCpf={handleEmployeeCpf}
+                handleEmployeeName={handleEmployeeName}
+                handleRFIDTag={handleRFIDTag}
+                handleLicenseType={handleLicenseType}
+                handleEmployeeType={handleEmployeeType}
+                handleEmployeeEmail={handleEmployeeEmail}
+                handleEmployeePassword={handleEmployeePassword}
+                role={employeeRole}
+                />
+                <Bottom>
+                    <Row style={{width: '100%', justifyContent: 'space-between', paddingBottom: '3rem'}}>
+                        <CloseButton onClick={props.handleModalVisible}>Fechar</CloseButton>
+                        <Button onClick={addEmployee}>Adicionar colaborador</Button>
+                    </Row>
+                </Bottom>
             </Inputs>
         </ModalStructure>
     )

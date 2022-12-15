@@ -157,67 +157,36 @@ function AcceptOS(props) {
             className: 'toast'
         });
     }
-    const postData = () => {
+    const postData = (id) => {
 
-        let token = sessionStorage.getItem('token');
-        const requestSettings = {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        }
-    
-        fetch(`http://api.estapar.code.br.com:1337/api/v1/order-of-service/accept/${props.id}`, requestSettings)
-        .then(response => {
-            return response.json()
-        })
-        .catch(error => {
-    
-            console.log(error);
-    
-        }).then(() => {
-            successToast();
-            props.handleModalVisible();
-        })
-        .catch(error => {
-            console.error("Error fetching data: ", error)
-        })
-    }
-
-    const authUser = () => {
-
+            console.log(id);
             let token = sessionStorage.getItem('token');
-            const userData = {
-                email: valletEmail,
-                password: valletPassword
-            }
             const requestSettings = {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(userData)
+                    'Authorization': `Bearer ${token}`
+                }
             }
-        
-            fetch('http://api.estapar.code.br.com:1337/api/v1/user/auth', requestSettings)
+            console.log(props.id);
+            fetch(`http://api.estapar.code.br.com:1337/api/v1/order-of-service/accept/${props.id}`, requestSettings)
             .then(response => {
-                return response.json()
+                if (response.status == 201) {
+                    successToast();
+                }
+                return response.json();
             })
             .catch(error => {
         
                 console.log(error);
         
             }).then(data => {
-                sessionStorage.setItem('token', data.success.data.token);
-                postData();
+                console.log(data);
             })
             .catch(error => {
                 console.error("Error fetching data: ", error)
             })
-
-        }
+    }
 
     return (
 
@@ -257,7 +226,7 @@ function AcceptOS(props) {
                 <Input id='vallet_password' onChange={handleValletPassword} name='vallet_password' type="password" placeholder="***********" />
                 <Row style={{justifyContent:'space-between'}}>
                     <CloseButton onClick={props.handleModalVisible}>Fechar</CloseButton>
-                    <AcceptButton onClick={authUser}>Aceitar ordem de serviço</AcceptButton>
+                    <AcceptButton onClick={postData}>Aceitar ordem de serviço</AcceptButton>
                 </Row>
             </Form>
             <ToastContainer
