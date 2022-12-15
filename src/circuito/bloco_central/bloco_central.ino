@@ -469,28 +469,16 @@ void reconnect()
       // Printing the current system status.
       Serial.println("MQTT Connected!");
 
-      // Subscribing...
+      // Subscribing to entry related mqtt topics...
       client.subscribe("Estapar/OrdemDeServicoDeEntradaEncontrada");
       client.subscribe("Estapar/OrdemDeServicoDeEntradaNaoEncontrada");
 
+      // Subscribing to exit related mqtt topics...
+			client.subscribe("Estapar/OrdemDeServicoDeSaidaEncontrada");
+			client.subscribe("Estapar/OrdemDeServicoDeSaidaNaoEncontrada");
+
       // Printing a blank line.
       Serial.println("");
-
-      if(hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE && distancia_do_roteador_em_metros) {
-
-        // Converting the distance to string.
-        String distance_in_meters_str = String(distancia_do_roteador_em_metros);
-
-        // Converting the string to a array of chars...
-        char *distance_in_meters_str_c = const_cast<char*>(distance_in_meters_str.c_str());
-
-        // Publishing that car distance...
-        client.publish("Estapar/CarroEstacionado/distancia", distance_in_meters_str_c);
-
-        // Printing the system current status.
-        Serial.println("Measured distance transmitted successfully!\n");
-
-      }
       
     } else {
 
@@ -632,6 +620,8 @@ void loop() {
 			// Setting the hardware stage as car parked.
 			hardware_stage = ENTRY__CAR_PARKED;
 
+      delay(2000);
+
 			// -------------------------- Warning --------------------------
 			//
 			// Initial configurations for distance measurement - <<<FTM>>>.
@@ -682,12 +672,24 @@ void loop() {
 			digitalWrite(OUTPUT_LED_2_G, LOW);
 			digitalWrite(OUTPUT_LED_2_B, HIGH);
 
-			// Subscribing to exit related mqtt topics...
-			client.subscribe("Estapar/OrdemDeServicoDeSaidaEncontrada");
-			client.subscribe("Estapar/OrdemDeServicoDeSaidaNaoEncontrada");
-
 			// Updating the hardware stage.
 			hardware_stage = EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE;
+
+      if(hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE && distancia_do_roteador_em_metros) {
+
+        // Converting the distance to string.
+        String distance_in_meters_str = String(distancia_do_roteador_em_metros);
+
+        // Converting the string to a array of chars...
+        char *distance_in_meters_str_c = const_cast<char*>(distance_in_meters_str.c_str());
+
+        // Publishing that car distance...
+        client.publish("Estapar/CarroEstacionado/distancia", distance_in_meters_str_c);
+
+        // Printing the system current status.
+        Serial.println("Measured distance transmitted successfully!\n");
+
+      }
 
 		} else if (hardware_stage == EXIT__WAITING_VALET_LINK_RFID_TO_SEARCH_ORDER_OF_SERVICE) {
 
@@ -721,10 +723,10 @@ void loop() {
 			client.subscribe("Estapar/LiberarDispositivo");
 
 			// Converting the string to a array of chars...
-			char *orderOfServiceIdStr = const_cast<char*>(exit_order_of_service_id.c_str());
+			char *exitOrderOfServiceIdStr = const_cast<char*>(exit_order_of_service_id.c_str());
 
 			// Publishing car delivered.
-			client.publish("Estapar/CarroEntregue", orderOfServiceIdStr);
+			client.publish("Estapar/CarroEntregue", exitOrderOfServiceIdStr);
 
 		}
     
