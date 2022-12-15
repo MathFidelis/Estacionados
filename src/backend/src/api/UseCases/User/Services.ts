@@ -52,6 +52,8 @@ export const UserService =  {
 			}
 	
 		} catch (error) {
+
+			console.log(error);
 	
 			return {
 				status: 500,
