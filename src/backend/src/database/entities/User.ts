@@ -112,6 +112,8 @@ export class User {
 		// Setting up the instancied user is temporary employee as the received is temporary employee.
 		user.is_temporary_employee = data.is_temporary_employee;
 
+		user.rfid = data.rfid;
+
 		// Saving the created user in the database.
 		user = await AppDataSource.getRepository(User).save(user);
 

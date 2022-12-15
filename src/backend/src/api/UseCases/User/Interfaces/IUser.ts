@@ -10,6 +10,7 @@ export interface IUser {
 	date_of_birth: Date,
 	type_of_driver_license: string,
 	is_temporary_employee: boolean,
+	rfid: string,
 	created_at?: Date,
 	updated_at?: Date
 }
