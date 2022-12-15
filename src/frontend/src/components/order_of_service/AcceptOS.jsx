@@ -110,8 +110,10 @@ width: 80%;
 
 function AcceptOS(props) {
 
-    useEffect(()=>{
+    useEffect(() => {
+
         let token = sessionStorage.getItem('token');
+    
         const requestSettings = {
             method: 'GET',
             headers: { 
@@ -119,25 +121,19 @@ function AcceptOS(props) {
                 'Authorization': `Bearer ${token}`,
             }
         }
-    
-        fetch('http://api.estapar.code.br.com:1337/api/v1/user?role=valet', requestSettings)
-        .then(response => {
-            return response.json()
+
+        fetch(`http://api.estapar.code.br.com:1337/api/v1/user?role=valet`, requestSettings).then((response) => {
+            return response.json();
+        }).then((data) => {
+            setValletsList(data.success.data);
         })
-        .catch(error => {
-    
-            console.log(error);
-    
-        }).then(data => setValletsList(data.success.data))
-        .catch(error => {
-            console.error("Error fetching data: ", error)
-        })
+
     }, [])
 
     const [ valletsList, setValletsList ] = useState([]);
     const [ valletEmail, setValletEmail ] = useState('');
     const [ valletPassword, setValletPassword ] = useState('');
-
+    console.log(valletsList)
     const handleValletEmail = (e) => {
         setValletEmail(e.target.value);
     }
@@ -157,23 +153,42 @@ function AcceptOS(props) {
             className: 'toast'
         });
     }
-    const postData = (id) => {
+    const postData = async (id) => {
 
-            console.log(id);
-            let token = sessionStorage.getItem('token');
             const requestSettings = {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    email:valletEmail,
+                    password: valletPassword})
+            }
+            console.log(valletEmail)
+            const response = await fetch('http://api.estapar.code.br.com:1337/api/v1/user/auth', requestSettings)
+            const json = await response.json();
+            if (json.status == 200) {
+                console.log(json.success.data);
+                sessionStorage.setItem('vallet_token', json.success.data.token);
+                sessionStorage.setItem('vallet_id', json.success.data.id);
+            }
+
+            let valletToken = sessionStorage.getItem('vallet_token');
+
+            console.log("Valet token: " + valletToken);
+
+            const acceptSettings = {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${valletToken}`
                 }
             }
-            console.log(props.id);
-            fetch(`http://api.estapar.code.br.com:1337/api/v1/order-of-service/accept/${props.id}`, requestSettings)
+            console.log(`props.id: ${props.id}`)
+            let vallet_id = sessionStorage.getItem('vallet_id');
+            fetch(`http://api.estapar.code.br.com:1337/api/v1/order-of-service/accept/${props.id}`, acceptSettings)
             .then(response => {
-                if (response.status == 201) {
-                    successToast();
-                }
+                successToast();
                 return response.json();
             })
             .catch(error => {
@@ -210,13 +225,12 @@ function AcceptOS(props) {
             <Form>
                 <Label htmlFor='vallet_name'>Quem é você?</Label>
                 <Select id='vallet_name' name='vallet_name' onChange={handleValletEmail}>
+                    <Option>Selecione seu email</Option>
                    {
                     valletsList.map((item, index)=> {
                             return (
-                                <Option 
-                                key={index}
-                                value={item.email}>
-                                    {item.first_name} {item.last_name}
+                                <Option key={index}>
+                                    {item.email}
                                 </Option>
                             )
                     })
