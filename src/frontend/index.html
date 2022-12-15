@@ -71,6 +71,7 @@
 
         console.log(message.payloadString);
         document.querySelector("#RFID-Input").value = message.payloadString;
+        sessionStorage.setItem('rfid', message.payloadString);
 
       }
     }

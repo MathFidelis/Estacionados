@@ -144,7 +144,7 @@ function App() {
     
             console.log(error);
     
-        }).then(data => setHistoryList(data.success.data))
+        }).then(data => console.log(data.success.data))
         .catch(error => {
             console.error("Error fetching data: ", error)
         })

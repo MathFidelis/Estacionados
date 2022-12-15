@@ -2,14 +2,11 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import characterImg from '../../assets/images/character.png';
 import AddEmployeeModal from '../../components/add_employee/AddEmployeeModal';
+import { ToastContainer, toast } from 'react-toastify';
 import arrow from '../../assets/images/arrow.svg';
 import { Link } from 'react-router-dom';
 
 function HomePage() {
-
-  useEffect(()=>{
-    let token = sessionStorage.getItem('token');
-  }, [])
 
   const [ modalVisible, setModalVisible ] = useState(false);
   const handleModalVisible = () => {
@@ -193,6 +190,20 @@ const handleName = (e) => {
   setName(e.target.value);
 }
 
+const successToast = () => {
+  toast.success('Colaborador registrado com sucesso!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      className: 'toast'
+  });
+}
+
   return (
   <Container>
     <Column>
@@ -228,7 +239,6 @@ const handleName = (e) => {
                 <SmallerP>manobristas</SmallerP>
               </StatsDiv>
               <AddButton onClick={handleModalVisible}>+</AddButton>
-
             </Row>
           </Column>
         </Column>
@@ -236,10 +246,24 @@ const handleName = (e) => {
     </Column>
     {modalVisible === true &&
       <AddEmployeeModal 
-        handleModalVisible={handleModalVisible} 
-        name={name} 
-        handleName={handleName}
+          handleModalVisible={handleModalVisible} 
+          toast={successToast}
+          name={name} 
+          handleName={handleName}
       />}
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+    <ToastContainer />
     </Container> 
   )
 
