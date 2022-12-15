@@ -133,6 +133,7 @@ justify-content: space-between;
 `
 const TBody = styled.tbody`
 width: 100%;
+height: 49.7vh;
 `
 
 const TrConstructor = (props) => {
@@ -253,13 +254,11 @@ function History() {
                 </Table>
                 </Column>
                 <PagesDiv className='pages-div'>
-                    <PageButton>1</PageButton>
-                    ...
+                    <PageButton className='active'>1</PageButton>
+                    <PageButton>2</PageButton>
                     <PageButton>3</PageButton>
-                    <PageButton className='active'>4</PageButton>
+                    <PageButton>4</PageButton>
                     <PageButton>5</PageButton>
-                    ...
-                    <PageButton>43</PageButton>
                 </PagesDiv>
             </Column>
             {modalVisible && <AddOS handleModalVisible={handleModalVisible} />}

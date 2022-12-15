@@ -242,8 +242,8 @@ function App() {
                         {valletsList.map((item, index) => {
                             return <TrConstructor key={index} 
                                     name={item.first_name + ' ' + item.last_name}
-                                    parkedAmount={item.carros}
-                                    time={`${item.tempoMedio}m`}
+                                    parkedAmount={'-'}
+                                    time={'-'}
                                     date={item.created_at.split('T')[0]}
                                 />  
                         })}
@@ -252,13 +252,11 @@ function App() {
             </Column>
 
             <PagesDiv className='pages-div'>
-                <PageButton onClick={()=> {console.log('a')}}>1</PageButton>
-                ...
+                <PageButton className='active'>1</PageButton>
+                <PageButton>2</PageButton>
+                <PageButton>4</PageButton>
                 <PageButton>3</PageButton>
-                <PageButton className='active'>4</PageButton>
-                <PageButton>5</PageButton>
-                ...
-                <PageButton>43</PageButton>
+                <PageButton>4</PageButton>
             </PagesDiv>
 
         </Column>

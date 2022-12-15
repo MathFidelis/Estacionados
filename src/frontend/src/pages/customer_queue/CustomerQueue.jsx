@@ -51,6 +51,20 @@ text-align: left;
 
 function CustomerQueue() {  
 
+  const successToast = () => {
+    toast.success('Colaborador registrado com sucesso!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      className: 'toast'
+    });
+  }
+
   const PlateConstructor = (props) => {
 
     const Plate = styled.button`
@@ -72,12 +86,12 @@ function CustomerQueue() {
     return (
       
       props.done ?
-      <Plate onClick={()=>{console.log('a')}} style={{backgroundColor:'#70D44B'}}>
+      <Plate style={{backgroundColor:'#70D44B'}}>
         {props.plate}
         <Time>há {props.time} minutos</Time>
       </Plate>
       :
-      <Plate onClick={()=>{console.log('a')}}>
+      <Plate>
         {props.plate}
         <Time>há {props.time} minutos</Time>
       </Plate>
@@ -86,9 +100,14 @@ function CustomerQueue() {
   } 
 
   const [ fullQueue, setFullQueue ] = useState([]);
+  const [ pending, setPending ] = useState([]);
+  const [ accepted, setAccepted ] = useState([]);
+  const [ finished, setFinished ] = useState([]);
 
   useEffect(()=>{
+    successToast();
 
+    let token = sessionStorage.getItem('token');
     const requestSettings = {
         method: 'GET',
         headers: { 
@@ -99,6 +118,7 @@ function CustomerQueue() {
 
     fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=pending,accepted,finished', requestSettings)
     .then(response => {
+        console.log(response.json());
         return response.json()
     })
     .catch(error => {
@@ -111,7 +131,22 @@ function CustomerQueue() {
         console.error("Error fetching data: ", error)
     })
 
-  })
+    console.log(fullQueue);
+    fullQueue.forEach((item) => {
+      if (item.status === "pending") {
+        pending.push(item);
+      }
+      else if (item.status === "accepted") {
+        accepted.push(item);
+      }
+      else {
+        finished.push(item);
+      }
+
+    })
+    console.log(`${pending}\n${accepted}\n${finished}`)
+
+  }, [])
 
   return (
     <>

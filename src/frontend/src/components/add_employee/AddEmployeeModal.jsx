@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
 import styled from "styled-components";
 import ModalStructure from "../modal_structure/Modal";
 import "./AddEmployeeModal.css";
@@ -160,10 +161,10 @@ function UserInputs(props) {
                         <Option>Temporário</Option>
                         <Option>Efetivado</Option>
                     </Select>
-                    <ModalInput style={{width: '50%'}} placeholder="********" onChange={props.handleEmployeePassword} />
+                    <ModalInput type={"password"} style={{width: '50%'}} placeholder="********" onChange={props.handleEmployeePassword} />
                 </Row>
                 <Label htmlFor="name">Tag RFID</Label>
-                <ModalInput readOnly='readonly' id="RFID-Input" onChange={props.handleRFIDTag}  className="modal-input" />
+                <ModalInput id="RFID-Input" onChange={props.handleRFIDTag} className="modal-input" />
             </DynamicInputs>
         )
         
@@ -174,9 +175,9 @@ function UserInputs(props) {
                 <Label htmlFor="name">Nome</Label>
                 <ModalInput onChange={props.handleEmployeeName} className="modal-input" placeholder="José da Silva" />
                 <Label htmlFor="email">E-mail</Label>
-                <ModalInput type={"email"} placeholder="administrador@estapar.com" />
+                <ModalInput placeholder="gerente@estapar.com" onChange={props.handleEmployeeEmail} />
                 <Label htmlFor="password">Senha</Label>
-                <ModalInput className="password" type={"password"} placeholder="********" />
+                <ModalInput type={"password"}placeholder="********" onChange={props.handleEmployeePassword} />
                 <Label htmlFor="cpf">CPF</Label>
                 <ModalInput type={"text"} onChange={props.handleEmployeeCpf} className="modal-input" name="cpf" placeholder="000.000.000-00" />
             </DynamicInputs>
@@ -210,6 +211,7 @@ function AddEmployeeModal(props) {
     const addEmployee = () => {
         let employeeData = {};
         let names = employeeName.split(' ');
+        let rfid_tag = sessionStorage.getItem('rfid');
         if (employeeRole == 'valet') {
 
             employeeData = {
@@ -220,7 +222,10 @@ function AddEmployeeModal(props) {
                 last_name: names[(names.length)-1],
                 cpf: employeeCpf,
                 type_of_driver_license: licenseType,
-                is_temporary_employee: employeeType
+                is_temporary_employee: employeeType,
+                date_of_birth: "12/19/2004",
+                identity_number: "10043285",
+                rfid: rfid_tag
             }
             
         }
@@ -233,32 +238,41 @@ function AddEmployeeModal(props) {
                 first_name: names[0],
                 last_name: names[(names.length)-1],
                 cpf: employeeCpf,
+                is_temporary_employee: employeeType,
+                date_of_birth: "12/19/2004",
+                identity_number: "10043285",
+                type_of_driver_license: '999',
+                rfid: 'RFIDTag'
             }
-            
+
         }
 
-        let token = sessionStorage.getItem('token');
         const requestSettings = {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify(employeeData)
         }
+
+        console.log(requestSettings.body);
     
         fetch('http://api.estapar.code.br.com:1337/api/v1/user', requestSettings)
         .then(response => {
+
+            if (response.status == 201) {
+                props.handleModalVisible();
+                props.toast();
+            }
+            else {
+                props.errorToast();
+            }
             return response.json()
         })
         .catch(error => {
     
             console.log(error);
     
-        })
-        .then(data => console.log(data))
-        .catch(error => {
-            console.error("Error fetching data: ", error)
         })
     
     }
@@ -271,6 +285,7 @@ function AddEmployeeModal(props) {
     }
     const handleEmployeeEmail = (e) => {
         setEmployeeEmail(e.target.value);
+        console.log(employeeEmail);
     }
     const handleEmployeePassword = (e) => {
         setEmployeePassword(e.target.value);
