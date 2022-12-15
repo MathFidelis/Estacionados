@@ -1,0 +1,17 @@
+input {
+    background-repeat: no-repeat;
+    background-size: 2rem;
+    background-position: 5px;
+}
+
+.toast {
+    font-size: 12px;
+}
+
+#password {
+    letter-spacing: 1px;
+}
+
+#password::placeholder {
+    letter-spacing: 2px;
+}

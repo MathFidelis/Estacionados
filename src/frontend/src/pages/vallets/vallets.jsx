@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import Header from '../../components/Header/Header';
+import React, { useEffect, useState } from 'react';
+import Header from '../../components/header/Header';
 import styled from 'styled-components';
 import character from '../../assets/images/character.png';
 import eye from '../../assets/images/eye.svg';
 import search from '../../assets/images/search.svg';
-import Modal from '../../components/AddModal/Modal';
+import AddEmployeeModal from '../../components/add_employee/AddEmployeeModal';
+import './Vallets.css';
 
 const Container = styled.div`
 display: flex;
@@ -12,6 +13,7 @@ display: flex;
 
 const Column = styled.div`
 display: flex;
+min-height: 398px;
 flex-direction: column;
 `
 
@@ -71,8 +73,8 @@ align-items: center;
 `
 
 const Tr = styled.tr`
-padding-top: 2rem;
-// padding-left: 4rem;
+border-radius: 0.7rem;
+padding: 1rem;
 font-size: 1.2rem;
 display: flex;
 width: 100%;
@@ -85,7 +87,7 @@ text-align: flex-start;
 padding-bottom: 2.5rem;
 `
 
-const Hr = styled.hr`
+const Border = styled.tr`
 width: 100%;
 border: 0.1px solid #E8E7E6;
 background-color: rgba(232, 231, 230, 0.5);
@@ -111,6 +113,17 @@ margin: 0 4rem;
 padding-top: 3rem;
 `
 
+const THead = styled.thead`
+display: flex;
+width: 100%;
+margin: 0px 4rem;
+padding: 0 1rem 1rem;
+justify-content: space-between;
+`
+const TBody = styled.tbody`
+width: 100%;
+`
+
 const PageButton = styled.button`
 display: flex;
 align-items: center;
@@ -131,7 +144,7 @@ font-weight: 600;
 const TrConstructor = (props) => {
 
     return (
-        <Tr>
+        <Tr className='vallet-line'>
             <Td>{props.name}</Td>
             <Td>{props.parkedAmount}</Td>
             <Td>{props.time}</Td>
@@ -144,7 +157,46 @@ const TrConstructor = (props) => {
 
 function App() {
 
+    const [ valletsList, setValletsList ] = useState([]);
+
+    useEffect(() => {
+
+        let token = sessionStorage.getItem('token');
+
+        const requestSettings = {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+
+        fetch('http://api.estapar.code.br.com:1337/api/v1/user?role=valet', requestSettings)
+        .then(response => {
+            return response.json()
+    })
+    .catch(error => {
+
+        console.log(error);
+
+    }).then(data => setValletsList(data.success.data))
+    .catch(error => {
+        console.error("Error fetching data: ", error)
+    })
+
+}, [])
+
+
+    const [ filterVallet, setFilterVallet ] = useState('');
     const [ modalVisible, setModalVisible ] = useState(false);
+
+    const handleFilterVallet = (e) => {
+        setFilterVallet(e.target.value);
+    }
+    
+    const filterVallets = () => {
+        console.log(filterVallet)
+    }
 
     const handleModalVisible = () => {
 
@@ -161,47 +213,57 @@ function App() {
 
     }
 
+
     return (
         <Container>
         <Column>
             <Row className='search' style={{marginTop: '3.5rem'}}>
-                <SearchInput placeholder='Digite um nome...'/>
-                <SearchButton><Img src={search}/></SearchButton><AddButton onClick={handleModalVisible}><P style={{color:'#fff'}}>+</P>Adicionar novo</AddButton>
+                <SearchInput onChange={handleFilterVallet} placeholder='Digite um nome...'/>
+                <SearchButton onClick={()=>{console.log(filterVallet)}}>
+                    <Img src={search}/>
+                </SearchButton>
+                <AddButton onClick={handleModalVisible}>
+                    <P style={{color:'#fff'}}>+</P>
+                    Adicionar novo
+                </AddButton>
             </Row>
             <Column>
                 <Table>
-                    <Tr style={{marginTop: '1.5rem', marginBottom: '1.5rem;'}}>
-                        <Th>Nome</Th>
-                        <Th>Qtd. carros estacionados</Th>
-                        <Th>Tempo médio por carro</Th>
-                        <Th>Data de cadastro</Th>
-                        <Th></Th>
-                    </Tr>
-                    <Hr />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
-                    <TrConstructor name='José da Silva Motta' parkedAmount='24' time='6m' date='20/07/2022' />
+                    <THead>
+                        <Tr style={{padding: '1rem 0 0 0', marginTop:'1.5rem'}}>
+                        <Th className="th-cell">Nome </Th>
+                        <Th className="th-cell">Qtd. carros estacionados</Th>
+                        <Th className="th-cell">Tempo médio por carro</Th>
+                        <Th className="th-cell">Data de cadastro</Th>
+                        <Th className="th-cell"></Th>
+                        </Tr>
+                    </THead>
+                    <TBody>
+                        {valletsList.map((item, index) => {
+                            return <TrConstructor key={index} 
+                                    name={item.first_name + ' ' + item.last_name}
+                                    parkedAmount={'-'}
+                                    time={'-'}
+                                    date={item.created_at.split('T')[0]}
+                                />  
+                        })}
+                    </TBody>
                 </Table>
             </Column>
 
             <PagesDiv className='pages-div'>
-                <PageButton onClick={()=> {console.log('a')}}>1</PageButton>
-                ...
+                <PageButton className='active'>1</PageButton>
+                <PageButton>2</PageButton>
+                <PageButton>4</PageButton>
                 <PageButton>3</PageButton>
-                <PageButton className='active'>4</PageButton>
-                <PageButton>5</PageButton>
-                ...
-                <PageButton>43</PageButton>
+                <PageButton>4</PageButton>
             </PagesDiv>
 
         </Column>
-    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} />}
+        {modalVisible === true &&
+      <AddEmployeeModal 
+        handleModalVisible={handleModalVisible} 
+      />}
     </Container>
     )
     

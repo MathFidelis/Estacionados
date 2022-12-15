@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import characterImg from '../../assets/images/character.png';
-import Modal from '../../components/AddModal/Modal'
+import AddEmployeeModal from '../../components/add_employee/AddEmployeeModal';
+import { ToastContainer, toast } from 'react-toastify';
 import arrow from '../../assets/images/arrow.svg';
 import { Link } from 'react-router-dom';
 
@@ -53,7 +54,7 @@ font-size: 3rem;
 font-weight: 700;
 `
 
-const Chevron = styled.button`
+const Chevron = styled.div`
   
   display: inline-block;
   margin-right: 6rem;
@@ -184,6 +185,25 @@ cursor: pointer;
 const Br = styled.br`
 `
 
+const [ name, setName ] = useState('');
+const handleName = (e) => {
+  setName(e.target.value);
+}
+
+const successToast = () => {
+  toast.success('Colaborador registrado com sucesso!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      className: 'toast'
+  });
+}
+
   return (
   <Container>
     <Column>
@@ -194,7 +214,7 @@ const Br = styled.br`
               <Bold>Acompanhar</Bold>
               em tempo real
             </Row>
-            <Link style={{textDecoration:'none'}} to='queue'>
+            <Link style={{textDecoration:'none', width:'10px'}} to='queue'>
             <QueueButton><Img src={arrow} style={{width:'1.5rem'}}/>Fila de <Br /> ordem de serviços</QueueButton>
             </Link>
             <Row style={{marginTop:"2rem"}}>
@@ -219,13 +239,31 @@ const Br = styled.br`
                 <SmallerP>manobristas</SmallerP>
               </StatsDiv>
               <AddButton onClick={handleModalVisible}>+</AddButton>
-
             </Row>
           </Column>
         </Column>
       </Main>
     </Column>
-    {modalVisible === true && <Modal handleModalVisible={handleModalVisible} />}
+    {modalVisible === true &&
+      <AddEmployeeModal 
+          handleModalVisible={handleModalVisible} 
+          toast={successToast}
+          name={name} 
+          handleName={handleName}
+      />}
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+    <ToastContainer />
     </Container> 
   )
 

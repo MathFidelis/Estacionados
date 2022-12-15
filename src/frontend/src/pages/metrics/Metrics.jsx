@@ -1,7 +1,8 @@
 import React from 'react';
 import character from '../../assets/images/vallet-ranking.png'
 import styled from 'styled-components';
-import './Metrics.css'
+import './Metrics.css';
+import { useEffect } from 'react';
 
 const Container = styled.div`
 display: flex;
@@ -123,6 +124,32 @@ function App() {
     font-weight: 700;
     margin-right: 0.5rem;
     `
+
+    useEffect(()=>{
+
+        let token = sessionStorage.getItem('token');
+        const requestSettings = {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+    
+        fetch('http://api.estapar.code.br.com:1337/api/v1/order-of-service?status=accepted', requestSettings)
+        .then(response => {
+            return response.json()
+        })
+        .catch(error => {
+    
+            console.log(error);
+    
+        }).then(data => console.log(data.success.data))
+        .catch(error => {
+            console.error("Error fetching data: ", error)
+        })
+    }, [])
+    
 
     return <Container>
         <Column>

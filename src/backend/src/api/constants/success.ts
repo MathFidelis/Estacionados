@@ -43,4 +43,8 @@ export const success = {
 		code: 1210,
 		title: "Usuário obtido com sucesso.",
 	},
+	rfid_set: {
+		code: 1211,
+		title: "RFID definido com sucesso.",
+	},
 };

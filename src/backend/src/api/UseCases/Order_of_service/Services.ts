@@ -56,6 +56,8 @@ export const OrderOfServiceService = {
 			// Getting the order of service from database.
 			let target_order_of_service = await order_of_service.getOrderOfServiceById({id: order_of_service_id});
 
+			console.log("OS: " + target_order_of_service);
+
 			// Checking if the order of service exists.
 			if(!target_order_of_service) {
 				
@@ -120,6 +122,8 @@ export const OrderOfServiceService = {
 	
 
 		} catch(error) {
+
+			console.log(error);
 
 			return {
 				status: 500,

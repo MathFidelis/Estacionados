@@ -42,6 +42,9 @@ export class User {
 	@Column({type: "boolean", nullable: false})
 	is_temporary_employee: boolean;
 
+	@Column({type: "varchar", nullable: true})
+	rfid: string;
+
 	@CreateDateColumn({type: "timestamp", nullable: false})
 	created_at?: Date;
 
@@ -108,6 +111,8 @@ export class User {
 
 		// Setting up the instancied user is temporary employee as the received is temporary employee.
 		user.is_temporary_employee = data.is_temporary_employee;
+
+		user.rfid = data.rfid;
 
 		// Saving the created user in the database.
 		user = await AppDataSource.getRepository(User).save(user);
@@ -183,6 +188,19 @@ export class User {
 		const users = await AppDataSource.getRepository(User).find({where: query});
 
 		return users;
+
+	}
+
+	async setRFID(user_id : string, rfid : string) {
+
+		// Saving the user in the database.
+		const user = await AppDataSource.getRepository(User).update({id: user_id}, {rfid: rfid});
+
+		// Getting the user by email address.
+		const updatedUser = await AppDataSource.getRepository(User).findOneBy({id: user_id});
+
+		// Returning the user.
+		return updatedUser;
 
 	}
 
